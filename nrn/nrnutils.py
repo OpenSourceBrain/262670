@@ -7,9 +7,9 @@
 # Created: Tue Jul 26 16:27:51 2016 (-0400)
 # Version: 
 # Package-Requires: ()
-# Last-Updated: Tue Sep 25 12:37:22 2018 (-0400)
-#           By: Subhasis  Ray
-#     Update #: 527
+# Last-Updated: Tue Apr  9 20:47:56 2024 (+0530)
+#           By: Subhasis Ray
+#     Update #: 539
 # URL: 
 # Doc URL: 
 # Keywords: 
@@ -37,7 +37,7 @@ from timeit import default_timer as timer
 from config import ur, logger, Q_
 import ephys
 import neurograph as ng
-from neurograph import (tograph, toswc, sorted_edges, branch_points, remove_null_edges, eucd, renumber_nodes)
+from neurograph import (swc2graph, graph2swc, sorted_edges, branch_points, remove_null_edges, eucd, renumber_nodes)
 # from morphoplot import (plot_3d_lines, plot_nodes)
 
 
@@ -99,9 +99,9 @@ def nrngraph(cell):
         if ref.has_parent():
             parent = ref.parent
             g.add_edge(parent.name(), cid, length=parent.L)
-            g.node[cid]['p'] = parent.name()
+            g.nodes[cid]['p'] = parent.name()
         else:
-            g.node[cid]['p'] = -1
+            g.nodes[cid]['p'] = -1
         # Insert the 1-end of a section as a dummy node
         if ref.nchild() == 0:
             leaf_node = '{}_1'.format(cid)
@@ -185,8 +185,8 @@ def select_random_segments_by_sid(g, sid, count, by_length=True, replace=True):
 
     """
     good_secs = [data['orig'] for n, data in g.nodes(data=True)
-                 if (g.node[n]['orig'] is not None)
-                 and (g.node[n]['s'] == sid)]
+                 if (g.nodes[n]['orig'] is not None)
+                 and (g.nodes[n]['s'] == sid)]
     seg_list = []
     seg_lengths = []
     for sec in good_secs:
@@ -211,8 +211,8 @@ def select_random_terminal_segments_by_sid(g, sid, count, by_length=True, replac
     """
     good_secs = []
     for n in g.nodes():
-        sec = g.node[n]['orig']        
-        if sec is not None and (g.node[n]['s'] == sid):
+        sec = g.nodes[n]['orig']        
+        if sec is not None and (g.nodes[n]['s'] == sid):
             ref = h.SectionRef(sec=sec)
             if len(ref.child) == 0:
                 good_secs.append(sec)
@@ -419,6 +419,7 @@ def create_cell(name, mechparams=None, Ra=None, calc_nseg=False, filename=None):
             raise Exception('Cell not preloaded. Specify template filename')
         h.xopen(filename)
     cell = eval('h.{}()'.format(name))
+    print(cell, type(cell))
     if mechparams is None:
         mechparams = {}
     print(mechparams)
@@ -516,9 +517,15 @@ def setup_current_clamp(cable, delay=100.0, duration=10.0, amplitude=100e-3,
 def insert_mechanisms(cell, mechanisms, ek=-80.0 * ur.mV,
                       ena=55.0 * ur.mV, eca=160.0 * ur.mV):
     """Insert a mechanism in all sections for a given conductance density"""
-    for sec in cell.allsec():
+    cell.soma.push()
+    ordered_tree = h.SectionList()
+    ordered_tree.wholetree()
+    h.pop_section()
+    for sec in ordered_tree:
+        sec.push()
         for mech in mechanisms:
             mech.insert_into(sec)
+        h.pop_section()
 
             
 def block_run(Dt=100.0, logger=None):

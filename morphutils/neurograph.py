@@ -127,7 +127,9 @@ nodecolor_10cs3 = {
     9: (188, 128, 189)
 }
 
-nodecolor_7q = { # Alternative Scheme for Qualitative Data from https://personal.sron.nl/~pault/
+#: Alternative Scheme for Qualitative Data from
+#: https://personal.sron.nl/~pault/
+nodecolor_7q = { 
     0: (187, 187, 187),
     1: (102, 204, 238),
     2: (68, 119, 170),
@@ -137,7 +139,8 @@ nodecolor_7q = { # Alternative Scheme for Qualitative Data from https://personal
     6: (34, 136, 51)
 }
 
-nodecolor_7cp = {  # 7-class paired from colorbrewer2.org
+#: 7-class paired from colorbrewer2.org
+nodecolor_7cp = {  
     0: (166, 206, 227),
     1: (31, 120, 180),
     2: (178, 223, 138),
@@ -147,7 +150,8 @@ nodecolor_7cp = {  # 7-class paired from colorbrewer2.org
     6: (253, 191, 111),
 }
 
-nodecolor_7cd2 = { # 7 class dark 2
+#: 7 class dark 2
+nodecolor_7cd2 = { 
     0: (127, 158, 119),
     1: (217, 95, 2),
     2: (117, 112, 179),
@@ -167,7 +171,8 @@ nodecolor_7ca = {
     6: (191, 91, 23),
 }
 
-nodecolor_9q = { # https://personal.sron.nl/~pault/colourschemes.pdf, SRON EPS technical note
+#: https://personal.sron.nl/~pault/colourschemes.pdf, SRON EPS technical note
+nodecolor_9q = { 
     0 : (136, 204, 238),
     1 : (221, 204, 119),
     2 : (68, 170, 153),
@@ -179,7 +184,8 @@ nodecolor_9q = { # https://personal.sron.nl/~pault/colourschemes.pdf, SRON EPS t
     8 : (136, 34, 85),
 }
 
-nodecolor_15cb = { # colorblind friendly
+#: colorblind friendly
+nodecolor_15cb = { 
     0: (0, 0, 0),     #000000
     1: (0, 73, 73),     #004949   # soma
     2: (0, 146, 146),     #009292
@@ -196,6 +202,7 @@ nodecolor_15cb = { # colorblind friendly
     13: (36, 255, 36),     #24ff24
     14: (255, 255, 109),     #ffff6d
 }
+
 
 colormaps = {'3cd2': nodecolor_3cd2,
              '3cs2': nodecolor_3cs2,
@@ -241,13 +248,12 @@ def eucd(G, n1, n2):
 
     Assumes there exist attributes x, y and z for each node.
     """
-    return np.sqrt((G.node[n1]['x'] - G.node[n2]['x'])**2
-                   + (G.node[n1]['y'] - G.node[n2]['y'])**2 +
-                   (G.node[n1]['z'] - G.node[n2]['z'])**2)
+    return np.sqrt((G.nodes[n1]['x'] - G.nodes[n2]['x'])**2
+                   + (G.nodes[n1]['y'] - G.nodes[n2]['y'])**2 +
+                   (G.nodes[n1]['z'] - G.nodes[n2]['z'])**2)
 
 
-
-def tograph(source):
+def swc2graph(source):
     """Convert an SWC file into a networkx DiGraph.
 
     Parameters
@@ -279,12 +285,12 @@ def tograph(source):
             g.add_edge(row['p'], row['n'])
         else:
             g.add_node(row['n'])
-        g.node[row['n']]['x'] = row['x']
-        g.node[row['n']]['y'] = row['y']
-        g.node[row['n']]['z'] = row['z']
-        g.node[row['n']]['r'] = row['r']
-        g.node[row['n']]['p'] = row['p']
-        g.node[row['n']]['s'] = row['s']
+        g.nodes[row['n']]['x'] = row['x']
+        g.nodes[row['n']]['y'] = row['y']
+        g.nodes[row['n']]['z'] = row['z']
+        g.nodes[row['n']]['r'] = row['r']
+        g.nodes[row['n']]['p'] = row['p']
+        g.nodes[row['n']]['s'] = row['s']
     # Store physical length of each edge
     # UPDATE: networkx2.0 removed Graph.edges_iter
     if nx.__version__.startswith('1.') or nx.__version__.startswith('0.'):
@@ -296,21 +302,38 @@ def tograph(source):
     return g
 
 
-def toswc(G, filename):
+def graph2swc(G, filename):
     """Save the morphology in graph G as an swc file"""
     with open(filename, 'w') as fd:
         for n in sorted(G.nodes()):
             try:
-                fd.write('{} {s} {x:.3f} {y:.3f} {z:.3f} {r:.3f} {p}\n'.format(n, **G.node[n]))
+                fd.write('{} {s} {x:.6f} {y:.6f} {z:.6f} {r:.6f} {p}\n'.format(
+                    n, **G.nodes[n]))
             except KeyError as e:
                 print('Error with node', n, ':', e)
+                print('Node attributes:', G.nodes[n])
 
+                
+def numpy2swc(swc, filename):
+    """Convert numpy array into SWC.
+
+    Parameters
+    ----------
+    swc: np.ndarray or np.recarray
+        The columns in swc array (recarray) must be:
+        id, type, x, y, z, r, parentid
+    filename: path of the SWC file to save data in.
+    """
+    np.savetxt(filename, swc, '%d %d %.6f %.6f %.6f %.6f %d')
+    
 
 def sorted_edges(G, attr='length', reverse=False):
     """Sort the edges by attribute `attr`, defaults to `length`"""
     if nx.__version__.startswith('1.') or nx.__version__.startswith('0.'):
-        return sorted(G.edges_iter(), key=lambda x: G[x[0]][x[1]][attr], reverse=reverse)
-    return sorted(list(G.edges), key=lambda x: G.edges[x[0], x[1]][attr], reverse=reverse)
+        return sorted(G.edges_iter(), key=lambda x: G[x[0]][x[1]][attr],
+                      reverse=reverse)
+    return sorted(list(G.edges), key=lambda x: G.edges[x[0], x[1]][attr],
+                  reverse=reverse)
 
 
 def branch_points(G):
@@ -326,7 +349,8 @@ def branch_points(G):
 
 def n_branch(G):
     """Number of branches in cell graph G"""
-    return sum([d for n, d in branch_points(G)]) + 1  # +1 For the tree trunk from soma
+    # +1 For the tree trunk from soma
+    return sum([d for n, d in branch_points(G)]) + 1 
 
 
 def get_stype_node_map(g):
@@ -384,21 +408,22 @@ def select_random_items_by_key(listdict, keys, counts, replace=False):
     return ret
 
 
-def remove_null_edges(G, n0, n1=None, attr='length', lim=0.1, rtol=1e-5, atol=1e-8):
+def remove_null_edges(G, n0, n1=None, attr='length', lim=0.1,
+                      rtol=1e-5, atol=1e-8):
     """Recursively remove edges in G starting with [n0->n1] if the edge has
     attribute attr=0.
 
     WARNING: it modifies G itself and the nodes should renumbered.
     """
     for n in list(nx.all_neighbors(G, n0)):
-        if n != G.node[n0]['p']:
+        if n != G.nodes[n0]['p']:
             remove_null_edges(G, n, n0, rtol=rtol, atol=atol)
     if n1 is None:
         return
     if np.isclose(G[n0][n1][attr], 0.0, rtol=rtol, atol=atol):
         for n in list(nx.all_neighbors(G, n0)):
             if n not in G.neighbors(n0):
-                G.node[n]['p'] = n1
+                G.nodes[n]['p'] = n1
                 G.add_edge(n, n1, G[n][n0])
         G.remove_node(n0)
 
@@ -417,9 +442,10 @@ def remove_shorter_edges(G, n0=1, lim=0.1, verbose=False):
             for n in list(nx.neighbors(G, n0)):
                 if G[n0][n]['length'] < lim:
                     if verbose:
-                        print('removing', n0, '->', n, 'of length', G[n0][n]['length'])
+                        print('removing', n0, '->', n, 'of length',
+                              G[n0][n]['length'])
                     for n2 in list(G.neighbors(n)):
-                        G.node[n2]['p'] = n0
+                        G.nodes[n2]['p'] = n0
                         G.add_edge(n0, n2, length=G[n][n2]['length'])
                     G.remove_node(n)
                     todo[n2] = None
@@ -443,9 +469,11 @@ def remove_longer_edges(G, lim=100.0, verbose=False):
     for n0, n1 in edges:
         if G[n0][n1]['length'] > lim:
             if verbose:
-                print('long edge: {} -- {}: {} um'.format(n0, n1, G[n0][n1]['length']))
+                print('long edge: {} -- {}: {} um'.format(
+                    n0, n1, G[n0][n1]['length']))
             long_edges.append((n0, n1))
-        else: # edges are already sorted in descending order, skip shorter edges
+        else:
+            # edges are already sorted in descending order, skip shorter edges
             break
     components = []
     if len(long_edges) > 0:
@@ -461,7 +489,8 @@ def remove_longer_edges(G, lim=100.0, verbose=False):
     return components, long_edges
 
 
-def cleanup_morphology(G, start=1, lmin=0.1, rmin=0.1, rdefault=0.5, verbose=False):
+def cleanup_morphology(G, start=1, lmin=0.1, rmin=0.1, rdefault=0.5,
+                       verbose=False):
     """Remove edges that are shorter than lmin and with radius less than
     rmin.
 
@@ -473,9 +502,13 @@ def cleanup_morphology(G, start=1, lmin=0.1, rmin=0.1, rdefault=0.5, verbose=Fal
     return Gnew, nmap
 
 
-
-def renumber_nodes(G, start=1):
+def renumber_nodes(G, start=1, undirected=True):
     """Renumber nodes so that NeuronLand converter does not mess up.
+
+    undirected: bool, if True convert G to undirected graph
+    first. This helps avoid problems when the order of the
+    parent-child nodes is incorrect but connections are fine.
+        
 
     Returns: (new_graph, node_map)
 
@@ -486,9 +519,10 @@ def renumber_nodes(G, start=1):
     """
     ret = nx.DiGraph()
     node_map = {}
-
+    if undirected:
+        G = G.to_undirected()
     # The nodes are connected as child->parent, we are starting from root,
-    # hence reverse
+    # hence reverse    
     for ii, (n1, n2) in enumerate(nx.dfs_edges(G, start)):
         m1 = ii+1
         m2 = ii+2
@@ -497,12 +531,12 @@ def renumber_nodes(G, start=1):
         else:
             node_map[n1] = m1
             ret.add_node(m1)
-            ret.node[m1].update(G.node[n1])
+            ret.nodes[m1].update(G.nodes[n1])
         node_map[n2] = m2
         ret.add_edge(m1, m2, length=G[n1][n2])
-        ret.node[m2].update(G.node[n2])
-        ret.node[m2]['p'] = m1
-    ret.node[1]['p'] = -1
+        ret.nodes[m2].update(G.nodes[n2])
+        ret.nodes[m2]['p'] = m1
+    ret.nodes[1]['p'] = -1
     return ret, node_map
 
 
@@ -518,25 +552,26 @@ def update_thin_segs(G, n=1, lim=0.1, default=None, verbose=False):
     while len(stack) > 0:
         n = stack[-1]
         stack.pop()
-        attr = G.node[n]
+        attr = G.nodes[n]
         if attr['r'] < lim:
             rcmax = 0.0
             for c in list(G.neighbors(n)):
-                rc = G.node[c]['r']
+                rc = G.nodes[c]['r']
                 if rcmax < rc:
                     rcmax = rc
             parent = attr['p']
             if parent > 0:
-                rp = G.node[parent]['r']
+                rp = G.nodes[parent]['r']
             else:
                 rp = rcmax
             r = (rp + rcmax) * 0.5
             if r > lim:
-                G.node[n]['r'] = r
+                G.nodes[n]['r'] = r
             else:
-                G.node[n]['r'] = default
+                G.nodes[n]['r'] = default
                 if verbose:
-                    print('Node {} radius set to default {}.'.format(n, default))
+                    print('Node {} radius set to default {}.'.format(
+                        n, default))
             stack += list(G.neighbors(n))
 
 
@@ -575,6 +610,7 @@ def soma_branch_len(g):
 
     return distdict
 
+
 def eleclen(g, rm_sp=1000.0, ra_sp=100.0, avg_dia=False, inplace=False):
     """Compute electrotonic length of each edge in `g` assuming specific
     membrane resistance rm_sp (default 1000 Ohm-cm2) and specific
@@ -612,33 +648,39 @@ def eleclen(g, rm_sp=1000.0, ra_sp=100.0, avg_dia=False, inplace=False):
     g2 = g if inplace else g.copy()
     rratio = 1e4 * rm_sp / ra_sp    # 1e4 to convert cm to um
     for n0, n1 in nx.dfs_edges(g2):
-        rad = (0.5 * (g2.node[n0]['r'] + g2.node[n1]['r'])) if avg_dia else g2.node[n0]['r']
+        rad = ((0.5 * (g2.nodes[n0]['r'] + g2.nodes[n1]['r']))
+               if avg_dia else g2.nodes[n0]['r'])
         g2[n0][n1]['L'] = g2[n0][n1]['length'] / np.sqrt(rad * rratio)
     return g2
 
 
-def join_neurites(left, leftnode, right, rightnode, leftroot=None):
+def join_neurites(left, leftnode, right, rightnode, leftroot=None,
+                  translate=False):
     """Join `leftnode` of cellgraph `left` with `rightnode` of cellgraph
     `right`.
 
-    Right will be translated to make `leftnode` and `rightnode`
+    translate: if True, `right` will be translated to make `leftnode` and `rightnode`
     overlap.
     All the nodes will be renumbered.
     """
-    lmax = max(left.nodes())
-    label_map = {node: node+lmax for node in right.nodes()}
+    dn = max(left.nodes()) + 1
+    label_map = {node: node + dn for node in right.nodes()}
     relabeled = nx.relabel_nodes(right, label_map)
+    if translate:
+        dx, dy, dz = (left.nodes[leftnode]['x'] - right.nodes[rightnode]['x'],
+                      left.nodes[leftnode]['y'] - right.nodes[rightnode]['y'],
+                      left.nodes[leftnode]['z'] - right.nodes[rightnode]['z'])
+    else:
+        dx, dy, dz = 0, 0, 0
     for node in relabeled:
-        relabeled.node[node]['p'] += lmax
-        relabeled.node[node]['x'] += (left.node[leftnode]['x'] -
-                                      right.node[rightnode]['x'])
-        relabeled.node[node]['y'] += (left.node[leftnode]['y'] -
-                                      right.node[rightnode]['y'])
-        relabeled.node[node]['z'] += (left.node[leftnode]['z'] -
-                                      right.node[rightnode]['z'])
-    relabeled.node[label_map[rightnode]]['p'] = leftnode
+        relabeled.nodes[node]['p'] += dn
+        relabeled.nodes[node]['x'] += dx
+        relabeled.nodes[node]['y'] += dy
+        relabeled.nodes[node]['z'] += dz
+    relabeled.nodes[label_map[rightnode]]['p'] = leftnode
     combined = nx.union(left, relabeled)
-    combined.add_edge(leftnode, label_map[rightnode], length=0.0)
+    dl = 0 if translate else np.sqrt(dx ** 2 + dy ** 2 + dz ** 2)
+    combined.add_edge(leftnode, label_map[rightnode], length=dl)
     if leftroot is None:
         leftroot = min(left.nodes())
     return renumber_nodes(combined, leftroot)[0]

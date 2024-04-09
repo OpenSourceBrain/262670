@@ -2,10 +2,10 @@
 # rngseed: 9502               # random seed for numpy
 
 stimulus:
-    onset: 0.5s                   # when the stimulus starts (PN spiking rate increases)
-    duration: 1.0s                # duration of stimulus
-    tail: 1s                    # duration of simulation post stimulus end time
-    stabilization_time: 0.2s    # not even spontaneous activity - allow each cell to reach its resting Vm
+    onset: 0.1s                   # when the stimulus starts (PN spiking rate increases)
+    duration: 0.1s                # duration of stimulus
+    tail: 0.1s                    # duration of simulation post stimulus end time
+    stabilization_time: 0.02s    # not even spontaneous activity - allow each cell to reach its resting Vm
     
 pn: 
     delta: 5ms                  # parameter for inhomogeneous Poisson process to generate the PN spike times
@@ -23,18 +23,18 @@ pn:
     shifting_frac: 0.1          # what fraction will be newly recruited at each time bin
 
 kc:
-    filename: cell_templates/kc_1_comp.hoc    # celltemplate filename
+    filename: mb/cell_templates/kc_1_comp.hoc    # celltemplate filename
     name: KC             # name of the celltemplate
-    number: 50000        # total number of KCs
+    number: 5        # total number of KCs
     lca_frac: 0.7        # fraction of KC population located in LCA / synapsed by LCA branch of GGN
-    n_vm: 500            # number of KCs to record Vm from
-    cluster_size: 1000    # number of KCs in each spatial cluster
+    n_vm: 5            # number of KCs to record Vm from
+    cluster_size: 1    # number of KCs in each spatial cluster
     # cluster_rs: 1058      # Random seed to reproduce cluster
     fake_clusters: False   # Create fake clusters to compare with spatial clustering of coactive KC->GGN connections
     shared_pn_frac: 0.8   # fraction of PN inputs KCs in each cluster share
 
 ggn:
-    filename: cell_templates/GGN_20170309_sc.hoc      # celltemplate filename
+    filename: mb/cell_templates/GGN_20170309_sc.hoc      # celltemplate filename
     name: GGN_20170309_sc                             # celltemplate name
     RA: 100ohm*cm
     RM: 33.33kohm*cm**2
@@ -119,6 +119,6 @@ ggn_kc_syn:           # GGN->KC graded synapse : gradedsyn.mod based on Papadopo
 #     std: 1.0
 
 output:
-    directory: /data/rays3/ggn/olfactory_network    # directory to dump simulation results in
+    directory: data    # directory to dump simulation results in
     
     
