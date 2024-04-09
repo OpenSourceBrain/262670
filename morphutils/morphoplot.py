@@ -59,9 +59,9 @@ def plot_3d_lines(graph, ax=None, color='k', alpha=0.7):
         else:
             c = color
         try:
-            px = graph.node[attr['p']]['x']
-            py = graph.node[attr['p']]['y']
-            pz = graph.node[attr['p']]['z']
+            px = graph.nodes[attr['p']]['x']
+            py = graph.nodes[attr['p']]['y']
+            pz = graph.nodes[attr['p']]['z']
             ax.plot([attr['x'], px], [attr['y'], py], [attr['z'], pz], 
                     color=c, ls='-', alpha=alpha)            
         except KeyError:
@@ -72,8 +72,8 @@ def plot_3d_lines(graph, ax=None, color='k', alpha=0.7):
 def mark_leaf_nodes(graph, ax, color='r', marker='o'):
     for node in graph.nodes():
         if graph.degree(node) == 1:
-            ax.plot([graph.node[node]['x']], [graph.node[node]['y']], [graph.node[node]['z']], marker=marker, color=color)
-            ax.text(graph.node[node]['x'], graph.node[node]['y'], graph.node[node]['z'], str(node))
+            ax.plot([graph.nodes[node]['x']], [graph.nodes[node]['y']], [graph.nodes[node]['z']], marker=marker, color=color)
+            ax.text(graph.nodes[node]['x'], graph.nodes[node]['y'], graph.nodes[node]['z'], str(node))
     return ax
 
 def plot_nodes(g, nodes, ax, color='r', marker='^'):
@@ -85,9 +85,9 @@ def plot_nodes(g, nodes, ax, color='r', marker='^'):
     ax = plot_nodes(g, nodes, ax)
     """
     for n in nodes:
-        x = g.node[n]['x']
-        y = g.node[n]['y']
-        z = g.node[n]['z']
+        x = g.nodes[n]['x']
+        y = g.nodes[n]['y']
+        z = g.nodes[n]['z']
         ax.plot([x], [y], [z], marker=marker, color=color)
         ax.text(x, y, z, str(n))
         

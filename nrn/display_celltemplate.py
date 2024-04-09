@@ -12,9 +12,9 @@ import nrnutils as nu
 import neurograph as ng
 import networkx as nx
 
-sys.path.append('D:/subhasis_ggn/model/morphutils')
-sys.path.append('c:/nrn/lib/python')
-os.environ['NEURONHOME'] = 'c:\nrn'
+# sys.path.append('D:/subhasis_ggn/model/morphutils')
+# sys.path.append('c:/nrn/lib/python')
+# os.environ['NEURONHOME'] = 'c:\nrn'
 
 import morph3d
 

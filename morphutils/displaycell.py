@@ -7,9 +7,9 @@
 # Created: Wed Jul 13 17:04:41 2016 (-0400)
 # Version:
 # Package-Requires: ()
-# Last-Updated: Tue Mar 10 15:14:09 2020 (-0400)
+# Last-Updated: Tue Apr  9 16:19:58 2024 (+0530)
 #           By: Subhasis Ray
-#     Update #: 562
+#     Update #: 563
 # URL:
 # Doc URL:
 # Keywords:
@@ -192,7 +192,7 @@ if __name__ == '__main__':
         if ii > 0:
             maxnode = max(combined_cellgraph.nodes())
             for node in cellgraph.nodes():
-                cellgraph.node[node]['p'] += maxnode
+                cellgraph.nodes[node]['p'] += maxnode
             mapping = {n: n + maxnode for n in cellgraph.nodes()}
             cellgraph = nx.relabel_nodes(cellgraph, mapping)
         combined_cellgraph = nx.union(combined_cellgraph, cellgraph)
