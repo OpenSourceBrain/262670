@@ -7,9 +7,9 @@
 # Created: Thu Jun 30 10:27:20 2016 (-0400)
 # Version: 
 # Package-Requires: ()
-# Last-Updated: Tue Apr  9 15:15:35 2024 (+0530)
+# Last-Updated: Tue Apr  9 16:31:53 2024 (+0530)
 #           By: Subhasis Ray
-#     Update #: 89
+#     Update #: 102
 # URL: 
 # Doc URL: 
 # Keywords: 
@@ -58,16 +58,17 @@ logging.basicConfig(filename=logfilename, level=logging.DEBUG,
 
 logger = logging.getLogger('mb_model')
 
+try:
+    nrnhome = os.environ['NEURONHOME']
+    sys.path.append(os.path.join(nrnhome, 'lib', 'python'))
+except KeyError as err:
+    raise KeyError('Set envrionment variable NEURONHOME to the path of NEURON installation') from err
+
 if sys.platform == 'win32':
-    os.environ['NEURONHOME'] = 'c:\\nrn'
-    sys.path += ['c:\\nrn\\lib\\python', 'd:\\subhasis_ggn\\model\\common', 'd:\\subhasis_ggn\\model\\morphutils', 'd:\\subhasis_ggn\\model\\mb\\network']
     # The mod files are in the directory `mod` and nrnmech.dll is created there
     dll = os.path.join(os.path.dirname(__file__), 'mod', 'nrnmech.dll')
     print('nrnmech', dll)
     h.nrn_load_dll(dll)
-else:
-    # os.environ['NEURONHOME'] = '/usr/local/apps/neuron/nrn-7.4/'
-    sys.path += ['/home/rays3/projects/ggn/mb', '/home/rays3/projects/ggn/common', '/home/rays3/projects/ggn/morphutils', '/home/rays3/projects/ggn/nrn', '/home/rays3/projects/ggn/mb/network']
 
 logger.info('sys.path={}'.format(str(sys.path)))
 h.load_file('stdrun.hoc')

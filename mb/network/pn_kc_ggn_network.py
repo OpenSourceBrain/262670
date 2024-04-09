@@ -7,9 +7,9 @@
 # Created: Wed Feb 21 13:17:05 2018 (-0500)
 # Version:
 # Package-Requires: ()
-# Last-Updated: Tue Mar 10 15:42:53 2020 (-0400)
+# Last-Updated: Tue Apr  9 16:59:03 2024 (+0530)
 #           By: Subhasis Ray
-#     Update #: 2837
+#     Update #: 2864
 
 # Code:
 """This script if for creating the PN->KC<->GGN network with KC<->GGN
@@ -44,9 +44,10 @@ print('Imported all modules')
 sys.stdout.flush()
 
 warnings.filterwarnings('ignore')
-with open('network/config.yaml', 'rt') as fd:
-    netconf = yaml.load(fd)
-print('Loaded config.yaml')
+config_path = os.path.join(os.environ['MODEL_DIR'], 'mb', 'network', 'config.yaml')
+with open(config_path, 'rt') as fd:
+    netconf = yaml.load(fd, Loader=yaml.Loader)
+print(f'Loaded {config_path}')
 sys.stdout.flush()
 
 # Faking sklearn.KMeans for fake clusters87
@@ -144,7 +145,13 @@ class kc_population(object):
         """
         start = timer()
         if not hasattr(h, params['kc']['name']):
-            h.xopen(params['kc']['filename'])
+            if os.path.isabs(params['kc']['filename']):
+                kctemplate = params['kc']['filename']
+            else:
+                kctemplate = os.path.join(os.environ['MODEL_DIR'], params['kc']['filename'])
+            if not os.path.exists(kctemplate):
+                raise FileNotFoundError(f'{kctemplate} does not exist. Please correct the path in config.yaml/kc/filename')
+            h.xopen(kctemplate)
         kc_class = eval('h.{}'.format(params['kc']['name']))
         self.kcs = [kc_class() for ii in range(params['kc']['number'])]
         self.positions_3d = np.zeros((params['kc']['number'], 3))
@@ -172,7 +179,13 @@ class ggn_population(object):
         """
         start = timer()
         if not hasattr(h, params['ggn']['name']):
-            h.xopen(params['ggn']['filename'])
+            if os.path.isabs(params['ggn']['filename']):
+                ggntemplate = params['ggn']['filename']
+            else:
+                ggntemplate = os.path.join(os.environ['MODEL_DIR'], params['ggn']['filename'])
+            if not os.path.exists(ggntemplate):
+                raise FileNotFoundError(f'{ggntemplate} does not exist. Please correct the path in config.yaml/ggn/filename')
+            h.xopen(ggntemplate)
         self.ggn = eval('h.{}()'.format(params['ggn']['name']))
         for sec in self.ggn.all:
             sec.Ra = Q_(params['ggn']['RA']).to('ohm * cm').m
@@ -691,7 +704,7 @@ class pn_kc_ggn_network(object):
         if delay_std > 0:
             _delay = np.random.normal(delay, delay_std, size=len(pn_indices))
         else:
-            _delay = [delay] * len(pn_indices)
+            _delay = np.array([delay] * len(pn_indices))
         _delay[_delay < 0] = delay    # replace negative delays with mean delay
         netcons = [h.NetCon(self.pns.vecstims[ii],
                             synapse, thresh, _delay[jj], _gmax[jj], sec=kc.soma)
@@ -891,6 +904,9 @@ def get_model_files(model_dir, subdirs):
 
 def prerun_save(params):
     """Save model files before starting simulation"""
+    if not os.path.exists(params['output']['directory']):
+        raise FileNotFoundError(f'Output directory {params["output"]["directory"]} does not exist.'
+                                'Please create it or set config.yaml/output/directory to an existing directory.')
     outfile = os.path.join(
         params['output']['directory'],
         'mb_net_UTC{}-PID{}-JID{}.h5'.format(
@@ -1426,7 +1442,7 @@ if __name__ == '__main__':
         netconf['kc']['cluster_rs'] = args.kmseed
     if args.kc_frac_weak_inh > 0:
         netconf['ggn_kc_syn']['frac_weakly_inhibited'] = args.kc_frac_weak_inh
-    if args.ggn_kc_gmax_weak > 0:
+    if Q_(args.ggn_kc_gmax_weak).to('pS').m > 0:
         netconf['ggn_kc_syn']['gmax_weakly_inhibited'] = args.ggn_kc_gmax_weak
     if Q_(args.ig_ggn_gmax).to('pS').m >= 0:
         netconf['ig_ggn_syn']['gmax'] = args.ig_ggn_gmax
