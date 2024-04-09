@@ -3,7 +3,7 @@
 
     <notes>NeuroML file containing a single ion channel</notes>
 
-    <ionChannel id="Navp" conductance="1pS" type="ionChannelHH" species="na">
+    <ionChannel id="Nas" conductance="1pS" type="ionChannelHH" species="na">
 
         <notes>
             Implementation of slow Na+ channel ( NAS ) from Wustenberg DG, Boytcheva M, Grunewald B, Byrne JH, Menzel R, Baxter DA
@@ -11,13 +11,13 @@
             This is slow Na+ channel in Apis mellifera Kenyon cells :(cultured).
         </notes>
 
-        <gate id="m" type="gateHHratesTau" instances="3">
-            <forwardRate type="HHExpLinearRate" rate="1per_ms" midpoint="-30.1mV" scale="6.65mV"/>
+        <gate id="m" type="gateHHtauInf" instances="3">
+            <steadyState type="HHSigmoidVariable" rate="1" midpoint="-30.1mV" scale="6.65mV"/>
             <timeCourse type="Ray_nas_taum"/>
         </gate>
 
-        <gate id="h" type="gateHHratesTau" instances="1">
-            <forwardRate type="HHExpLinearRate" rate="1per_ms" midpoint="-51.4mV" scale="5.9mV"/>
+        <gate id="h" type="gateHHtauInf" instances="1">
+            <steadyState type="HHSigmoidVariable" rate="1" midpoint="-51.4mV" scale="-5.9mV"/>
             <timeCourse type="Ray_nas_tauh"/>
         </gate>
 
@@ -25,19 +25,15 @@
 
      <ComponentType name="Ray_nas_taum"
                    extends="baseVoltageDepTime"
-                   description="Tau parameter to describe Navp">
+                   description="Tau parameter to describe Nas">
 
         <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
         <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
-        <Constant name="max_tau" dimension="per_time" value="0.83 per_time"/>
-        <Constant name="min_tau" dimension="per_time" value="0.093 per_time"/>
+        <Constant name="max_tau" dimension="per_time" value="0.83 per_s"/>
+        <Constant name="min_tau" dimension="per_time" value="0.093 per_s"/>
         <Dynamics>
             <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
-            <ConditionalDerivedVariable name="t" dimension="time" exposure="t">
-                <Case condition="(ALPHA + BETA) .eq. 0" value="( 0 ) * TIME_SCALE"/>
-                <Case condition="1/( (ALPHA + BETA) * rateScale )  .lt. ( 0.02 )" value="( (0.02 * rateScale) ) * TIME_SCALE"/>
-                <Case value="( 1/(ALPHA + BETA) ) * TIME_SCALE"/>
-            </ConditionalDerivedVariable>
+            <DerivedVariable name="t" dimension="per_time" exposure="t" value="(max_tau - min_tau) / (1 + exp((V + 20.3) / 6.45)) + min_tau"/>
 
         </Dynamics>
 
@@ -45,91 +41,16 @@
 
     <ComponentType name="Ray_nas_tauh"
                    extends="baseVoltageDepTime"
-                   description="Tau parameter to describe Navp">
+                   description="Tau parameter to describe Nas">
 
         <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
         <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
-
-        <Requirement name="alpha" dimension="per_time"/>
-        <Requirement name="beta" dimension="per_time"/>
-        <Requirement name="rateScale" dimension="none"/>
-
+        <Constant name="max_tau" dimension="per_time" value="12.24 per_s"/>
+        <Constant name="min_tau" dimension="per_time" value="1.9 per_s"/>
         <Dynamics>
             <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
-            <DerivedVariable name="ALPHA" dimension="none" value="alpha * TIME_SCALE"/>
-            <DerivedVariable name="BETA" dimension="none" value="beta * TIME_SCALE"/>
+            <DerivedVariable name="t" dimension="per_time" exposure="t" value="(max_tau - min_tau) / (1 + exp((V + 32.6) / 8.0)) + min_tau"/>
 
-            <ConditionalDerivedVariable name="t" exposure="t" dimension="time">
-                <Case condition="(ALPHA + BETA) .eq. 0" value="( 0 ) * TIME_SCALE"/>
-                <Case condition="1/( (ALPHA + BETA) * rateScale )  .lt. ( 0.5 )" value="( (0.5 * rateScale) ) * TIME_SCALE"/>
-                <Case value="( 1/(ALPHA + BETA) ) * TIME_SCALE"/>
-            </ConditionalDerivedVariable>
-
-        </Dynamics>
-
-    </ComponentType>
-
-    <ComponentType name="Ray_nas_taus"
-                   extends="baseVoltageDepTime"
-                   description="Tau parameter to describe Navp">
-
-        <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
-        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
-        <Constant name="TEMP_SCALE" dimension="temperature" value="1 K"/>
-        <Constant name="R" dimension="none" value="8.315"/>
-        <Constant name="F" dimension="none" value="96480"/>
-
-        <Requirement name="rateScale" dimension="none"/>
-        <Requirement name="temperature" dimension="temperature"/>
-
-        <Dynamics>
-            <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
-            <DerivedVariable name="T" dimension="none" value="temperature / TEMP_SCALE"/>
-
-            <DerivedVariable name="alpha" dimension="none" value="exp((1e-3*12*(V+45)*F) / (R*(T+0.01)))"/> <!-- NEURON code: 273.16 + celsius-->
-            <DerivedVariable name="beta" dimension="none" value="exp((1e-3*12*0.2*(V+45)*F) / (R*(T+0.01)))"/> <!-- NEURON code: 273.16 + celsius-->
-
-            <DerivedVariable name="tmp" value="beta / (3e-4*(1 + alpha))" dimension="none"/>
-            <ConditionalDerivedVariable name="t" dimension="time" exposure="t" >
-                <Case condition="(tmp / rateScale) .lt. 10" value="10 * rateScale * TIME_SCALE"/>
-                <Case value="tmp * TIME_SCALE"/>
-            </ConditionalDerivedVariable>
-
-        </Dynamics>
-
-    </ComponentType>
-
-    <ComponentType name="Ray_nas_sss_ar2_1"
-                   extends="baseVoltageDepVariable"
-                   description="steadyState parameter to describe Navp">
-
-        <Constant name="no_inact" dimension="none" value="1"/> <!-- 1: no inact, 0: max inact-->
-        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
-
-        <Dynamics>
-            <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
-
-            <DerivedVariable name="alpha" dimension="none" value="1 / (1 + exp((V+43)/2))"/>
-
-            <DerivedVariable name="x" exposure="x" dimension="none" value="alpha + no_inact*(1 - alpha)"/>
-        </Dynamics>
-
-    </ComponentType>
-
-
-    <ComponentType name="Ray_nas_sss_ar2_0_8"
-                   extends="baseVoltageDepVariable"
-                   description="steadyState parameter to describe Navp">
-
-        <Constant name="no_inact" dimension="none" value="0.8"/> <!-- 1: no inact, 0: max inact-->
-        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
-
-        <Dynamics>
-            <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
-
-            <DerivedVariable name="alpha" dimension="none" value="1 / (1 + exp((V+43)/2))"/>
-
-            <DerivedVariable name="x" exposure="x" dimension="none" value="alpha + no_inact*(1 - alpha)"/>
         </Dynamics>
 
     </ComponentType>
