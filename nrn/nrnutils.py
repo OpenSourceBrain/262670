@@ -7,9 +7,9 @@
 # Created: Tue Jul 26 16:27:51 2016 (-0400)
 # Version: 
 # Package-Requires: ()
-# Last-Updated: Tue Apr  9 15:44:44 2024 (+0530)
+# Last-Updated: Tue Apr  9 20:47:56 2024 (+0530)
 #           By: Subhasis Ray
-#     Update #: 538
+#     Update #: 539
 # URL: 
 # Doc URL: 
 # Keywords: 
@@ -37,7 +37,7 @@ from timeit import default_timer as timer
 from config import ur, logger, Q_
 import ephys
 import neurograph as ng
-from neurograph import (tograph, toswc, sorted_edges, branch_points, remove_null_edges, eucd, renumber_nodes)
+from neurograph import (swc2graph, graph2swc, sorted_edges, branch_points, remove_null_edges, eucd, renumber_nodes)
 # from morphoplot import (plot_3d_lines, plot_nodes)
 
 

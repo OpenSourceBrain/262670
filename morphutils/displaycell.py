@@ -7,22 +7,12 @@
 # Created: Wed Jul 13 17:04:41 2016 (-0400)
 # Version:
 # Package-Requires: ()
-# Last-Updated: Tue Apr  9 16:19:58 2024 (+0530)
+# Last-Updated: Tue Apr  9 20:44:51 2024 (+0530)
 #           By: Subhasis Ray
-#     Update #: 563
-# URL:
-# Doc URL:
-# Keywords:
-# Compatibility:
-#
+#     Update #: 574
 #
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
-# Commentary:
-#
-#
-#
-#
 
 # Code:
 from __future__ import print_function
@@ -34,6 +24,7 @@ import networkx as nx
 import neurograph as ng
 import morphoplot as mp
 from matplotlib import pyplot as plt
+
 # plt.style.use('ggplot')
 
 
@@ -154,6 +145,8 @@ if __name__ == '__main__':
     parser.add_argument('-F', '--fullscreen', action='store_true',
                         help='Display fullscreen (only for VTK)',
                         dest='fullscreen')
+    parser.add_argument('--save', type=str, help='Save final rendering ' + 
+                        'into file (carried out at exit)')
     args = parser.parse_args()
     module = args.module
     lines = float(args.lines)
@@ -177,7 +170,7 @@ if __name__ == '__main__':
     combined_cellgraph = nx.DiGraph()
     for ii, fname in enumerate(args.filenames):
         print('Opening', fname)
-        cellgraph = ng.tograph(fname)
+        cellgraph = ng.swc2graph(fname)
         xshift, yshift, zshift = (0, 0, 0)
         print('##', args.translate)
         if len(args.translate) > ii:
@@ -214,13 +207,12 @@ if __name__ == '__main__':
         neuron3d(combined_cellgraph, lines=lines, label_nodes=label_nodes,
                  labels=label_nodes, nodecolor=colormap,
                  background=background, axes=args.scalebar,
-                 fullscreen=args.fullscreen)
+                 fullscreen=args.fullscreen, save=args.save)
     elif module == 'vispy':
         neuron3d(combined_cellgraph)
     elif module == 'vpython':
         neuron3d(combined_cellgraph)
     else:
         print('Unknown module', module)
-
 #
 # displaycell.py ends here

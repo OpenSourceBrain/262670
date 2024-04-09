@@ -7,9 +7,9 @@
 # Created: Mon Nov  7 16:56:31 2016 (-0500)
 # Version:
 # Package-Requires: ()
-# Last-Updated: Tue Apr  9 16:18:09 2024 (+0530)
+# Last-Updated: Tue Apr  9 20:44:11 2024 (+0530)
 #           By: Subhasis Ray
-#     Update #: 197
+#     Update #: 199
 
 # Code:
 
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     fpd = args.fpd
     framerate = args.framerate
     print(args.xangle, args.yangle, args.zangle, fpd, framerate)
-    graph = ng.tograph(infile)
+    graph = ng.swc2graph(infile)
 
     dump_movie(outfile, graph, xrot=args.xrot, yrot=args.yrot, zrot=args.zrot,
                xangle=args.xangle, yangle=args.yangle, zangle=args.zangle,

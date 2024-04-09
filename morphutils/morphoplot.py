@@ -76,6 +76,7 @@ def mark_leaf_nodes(graph, ax, color='r', marker='o'):
             ax.text(graph.nodes[node]['x'], graph.nodes[node]['y'], graph.nodes[node]['z'], str(node))
     return ax
 
+
 def plot_nodes(g, nodes, ax, color='r', marker='^'):
     """Mark the nodes of G plotted on axes ax.
     
@@ -90,6 +91,26 @@ def plot_nodes(g, nodes, ax, color='r', marker='^'):
         z = g.nodes[n]['z']
         ax.plot([x], [y], [z], marker=marker, color=color)
         ax.text(x, y, z, str(n))
+
+        
+def plot_nodes_2d(g, nodes, ax, label=False, proj='xy', color='r', marker='^',  alpha=1.0):
+    for n in nodes:
+        x = g.nodes[n][proj[0]]
+        y = g.nodes[n][proj[1]]
+        ax.plot([x], [y], marker=marker, color=color, alpha=alpha)
+        if label:
+            ax.text(x, y, str(n))
+
+        
+def plot_edges_2d(g, ax, label=False, proj='xy', color='r', marker='^', ls='-', alpha=0.8):
+    for n1, n2 in g.edges():
+        x1 = g.nodes[n1][proj[0]]
+        y1 = g.nodes[n1][proj[1]]
+        x2 = g.nodes[n2][proj[0]]
+        y2 = g.nodes[n2][proj[1]]
+        ax.plot([x1, x2], [y1, y2], marker=marker, ls=ls, color=color, alpha=alpha)
+        if label:
+            ax.text(x1, y1, str(n1))
         
         
         

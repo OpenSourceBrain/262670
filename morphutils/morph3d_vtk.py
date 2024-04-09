@@ -7,9 +7,9 @@
 # Created: Thu Jul 14 18:34:15 2016 (-0400)
 # Version: 
 # Package-Requires: ()
-# Last-Updated: Tue Apr  9 16:19:33 2024 (+0530)
+# Last-Updated: Tue Apr  9 20:46:36 2024 (+0530)
 #           By: Subhasis Ray
-#     Update #: 696
+#     Update #: 698
 # URL: 
 # Doc URL: 
 # Keywords: 
@@ -40,10 +40,14 @@ import numpy as np
 import networkx as nx
 from neurograph import nodecolor_10cp, nodecolor_4cp
 
-def create_labels(graph, label_nodes, labels=[], priorities=[]):
+def create_labels(graph, label_nodes, labels=[], priorities=[],
+                  color=(0, 0, 0)):
     label_points = vtk.vtkPoints()
     label_str = vtk.vtkStringArray()
     label_str.SetName('Labels')
+    label_prop = vtk.vtkTextProperty()
+    label_prop.SetColor(*color)
+    label_prop.ItalicOn()
     for ii, n in enumerate(label_nodes):
         label_points.InsertNextPoint((graph.nodes[n]['x'],
                                       graph.nodes[n]['y'],
@@ -58,20 +62,24 @@ def create_labels(graph, label_nodes, labels=[], priorities=[]):
     label_polydata.GetPointData().AddArray(label_str)
     hierarchy = vtk.vtkPointSetToLabelHierarchy()
     hierarchy.SetLabelArrayName(label_str.GetName())
+    hierarchy.GetTextProperty().SetColor(*color)
     if (len(priorities) > 0) and (len(priorities) == len(label_nodes)):
         parray = vtk.vtkIntArray()
         parray.SetName('Priorities')
         for priority in priorities:
             parray.InsertNextValue(priority)
             hierarchy.SetPriorityArrayName(parray.GetName())
-    label_mapper = vtk.vtkLabelPlacementMapper()
-    label_mapper.SetInputConnection(hierarchy.GetOutputPort())
+    label_pos_mapper = vtk.vtkLabelPlacementMapper()
+    label_pos_mapper.SetInputConnection(hierarchy.GetOutputPort())
+    label_strat = label_pos_mapper.GetRenderStrategy() # vtk.vtkFreeTypeLabelRenderStrategy()
+    label_strat.SetDefaultTextProperty(label_prop)
+    label_pos_mapper.SetRenderStrategy(label_strat)
     if vtk.VTK_MAJOR_VERSION <= 5:
         hierarchy.SetInput(label_polydata)
     else:
         hierarchy.SetInputData(label_polydata)
     label_actor = vtk.vtkActor2D()
-    label_actor.SetMapper(label_mapper)
+    label_actor.SetMapper(label_pos_mapper)
     return label_actor
 
 
@@ -159,13 +167,17 @@ def nrngraph2vtk(neuron_graph, label_nodes=[], labels=[], priorities=[], nodecol
     renderer.SetBackground(*background)
     renderer.AddActor(actor)
     if len(label_nodes) > 0:
-        label_actor = create_labels(neuron_graph, label_nodes, labels=labels, priorities=priorities)
+        label_actor = create_labels(neuron_graph, label_nodes, labels=labels,
+                                    priorities=priorities,
+                                    color=(1 - background[0],
+                                           1 - background[1],
+                                           1 - background[2]))
         renderer.AddActor2D(label_actor)
 
     return renderer, actor
     
 
-def neuron3d(neuron_graph, label_nodes=[], labels=[], priorities=[], nodecolor=nodecolor_4cp, background=(0,0,0), lines=False, stereo=False, axes=True, fullscreen=True):
+def neuron3d(neuron_graph, label_nodes=[], labels=[], priorities=[], nodecolor=nodecolor_4cp, background=(0,0,0), lines=False, stereo=False, axes=True, fullscreen=True, save=None):
     """axes: If true, show axis with scale bar info
     """
     renderer, actor = nrngraph2vtk(neuron_graph,
@@ -177,10 +189,10 @@ def neuron3d(neuron_graph, label_nodes=[], labels=[], priorities=[], nodecolor=n
         _ax.SetNumberOfLabels(0)
         _ax.SetYAxisVisibility(False)
         _ax.SetZAxisVisibility(False)
-        _ax.SetBounds(0, 200, -600, -400, 0, 200)
+        _ax.SetBounds(0, 200, 0, 200, 0, 200)
         _ax.SetXLabel('')
         _ax.SetXOrigin(0)
-        _ax.SetYOrigin(-600)
+        _ax.SetYOrigin(0)
         _ax.SetZOrigin(0)
         color = (1.0-background[0], 1.0-background[1], 1.0-background[2])
         tprop = vtk.vtkTextProperty()
@@ -215,8 +227,18 @@ def neuron3d(neuron_graph, label_nodes=[], labels=[], priorities=[], nodecolor=n
     
     interactor.Initialize()
     interactor.Start()
+    if save is not None:
+        w2if = vtk.vtkWindowToImageFilter()
+        w2if.SetInput(win)
+        w2if.SetInputBufferTypeToRGB()
+        w2if.ReadFrontBufferOff()
+        w2if.Update()
 
-
+        writer = vtk.vtkPNGWriter()
+        writer.SetFileName(save)
+        writer.SetInputConnection(w2if.GetOutputPort())
+        writer.Write()
+        print('Saved screenshot in', save)
     
     
         
