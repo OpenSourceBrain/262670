@@ -7,9 +7,9 @@
 # Created: Wed Feb 21 13:17:05 2018 (-0500)
 # Version:
 # Package-Requires: ()
-# Last-Updated: Tue Apr  9 16:59:03 2024 (+0530)
+# Last-Updated: Tue Apr  9 20:27:05 2024 (+0530)
 #           By: Subhasis Ray
-#     Update #: 2864
+#     Update #: 2914
 
 # Code:
 """This script if for creating the PN->KC<->GGN network with KC<->GGN
@@ -242,6 +242,14 @@ class ggn_population(object):
                               sec=self.ig.sec)
 
     def get_clusters(self, sid, numpos, size, random_state=None, fake=False):
+        """For structure specified by `sid` (SWC structure ID),
+        select `numpos` positions on the sections belonging to that
+        structure, and obtain spatial clusters of these positions
+        where each cluster is of size `size`.
+
+        The clustering is done by kmeans algorithm with k=`numpos // size`.
+
+        """
         sec_pos = nu.select_random_segments_by_sid(self.ggn_graph,
                                                    sid, numpos,
                                                    by_length=True,
@@ -249,7 +257,7 @@ class ggn_population(object):
         # print('numpos: {}, num secpos: {}'.format(numpos, len(sec_pos)))
         n_clust = int(round(numpos * 1.0 / size))
         if n_clust <= 1:
-            logger.info('Number of GGN position clusters <= 1. Returning Fakse clusters')
+            logger.info('Number of GGN position clusters <= 1. Returning Fake clusters')
             fake = True
             n_clust = 1  # avoid 0 for degenrate case
         kmeans, sec_list, x_list, pos_list = cluster_positions(
@@ -838,13 +846,34 @@ def make_exp2syn_one_one(kcs, sections, xpos, syn_params):
 
 
 def cluster_positions(sec_pos_list, nclust, random_state=None, fake=False):
-    """For a list of sections and corresponding segment positions [(sec,
-    x),...] `sec_pos_list`, obtain a spatial clustering of the
-    segments in 3D.
+    """For a list of sections and corresponding segment positions obtain
+    a spatial clustering of the segments in 3D. If `fake` is `False` then
+     groups of KCs will have locally reciprocal connections with GGN segments.
 
+    Parameters
+    ----------
+    sec_pos_list: list
+        list of tuples [(sec1, x1), (sec2, x2), ...] where sec1, sec2 are
+        the sections and x1, x2 are the 1D position along the section. From this
+        the actual 3D positions are retreieved in NEURON. 
+    nclust: int
+        number of clusters to construct
+    random_state: int, RandomState instance, or None (default)
+        random state to be passed on to sklearn clustering algorithm for
+        reproducibility
+    fake: bool
+        if True, KCs in each cluster are connected to random locations on GGN
+
+    Returns
+    -------
+    tuple: (kmeans, seclist, xlist, poslist)
+        kmeans: sklearn KMeans object used for clustering
+        seclist: list of the sections
+        xlist: list of 1D positions along sections
+        poslist: list of 3D positions of these poits
     """
-    print('secpos list len : {}'.format(len(sec_pos_list)))
-    print('nclust: {}'.format(nclust))
+    # print('secpos list len : {}'.format(len(sec_pos_list)))
+    # print('nclust: {}'.format(nclust))
     sec_pos_dict = defaultdict(list)
     for sec, pos in sec_pos_list:
         sec_pos_dict[sec].append(pos)
@@ -949,6 +978,10 @@ def save_cluster_labels(writer, region, labels, sections, xpos, pos3d, kcs):
         x, y, z = pos3d[ii]
         cluster_labels.put_data('{}_pos_{}'.format(region, ii),
                                 (label, sec.name(), pos, x, y, z))
+    # print('#' * 10, 'Number of cluster labels', len(labels))
+    # print('Sources', cluster_labels.get_sources())
+    # print('Labels', labels)
+    # print('Cluster labels', cluster_labels)
     cluster_labels_ds = writer.add_static_ds(
         '{}_cluster_labels'.format(region),
         cluster_labels.get_sources())
@@ -1193,7 +1226,9 @@ def save_recorded_data(writer, model, data_dict, params):
         sources = []
         for kc, spiketimes in zip(model.kcs.kcs, kc_spikes):
             sources.append(kc.soma.name())
-            kc_events.put_data(sources[-1], np.array(spiketimes.x))
+            st = [spiketimes.x[ii] for ii in range(spiketimes.size())]
+            # print('&' * 10, st)
+            kc_events.put_data(sources[-1], st)
         kc_spikes_ds = writer.add_event_ds_1d('kc', 'kc_spiketime',
                                               sources)
         writer.add_event_1d(kc_spikes_ds, kc_events)
