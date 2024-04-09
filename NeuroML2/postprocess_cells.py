@@ -65,9 +65,9 @@ def load_and_setup_cell(cellname: str):
     return celldoc
 
 
-def postprocess_GGM():
-    """Post process GGM and add biophysics."""
-    cellname = "GGM"
+def postprocess_GGN():
+    """Post process GGN and add biophysics."""
+    cellname = "GGN"
     celldoc = load_and_setup_cell(cellname)
     cell = celldoc.cells[0]  # type: neuroml.Cell
 
@@ -124,5 +124,70 @@ def postprocess_KC():
     write_neuroml2_file(celldoc, "KC.cell.nml")
 
 
+def KC_create_na_channel():
+    """Create the Na channel.
+
+    This will create the Na channel and save it to a file.
+    It will also validate this file.
+
+    returns: name of the created file
+    """
+    na_channel = component_factory(
+        "IonChannelHH",
+        id="na_channel",
+        notes="Sodium channel for HH cell",
+        conductance="10pS",
+        species="na",
+        validate=False,
+    )
+    gate_m = component_factory(
+        "GateHHRates",
+        id="m",
+        instances="3",
+        notes="m gate for na channel",
+        validate=False,
+    )
+    m_forward_rate = component_factory(
+        "HHRate", type="HHExpLinearRate", rate="1per_ms", midpoint="-40mV", scale="10mV"
+    )
+    m_reverse_rate = component_factory(
+        "HHRate", type="HHExpRate", rate="4per_ms", midpoint="-65mV", scale="-18mV"
+    )
+
+    gate_m.add(m_forward_rate, hint="forward_rate", validate=False)
+    gate_m.add(m_reverse_rate, hint="reverse_rate")
+    na_channel.add(gate_m)
+
+    gate_h = component_factory(
+        "GateHHRates",
+        id="h",
+        instances="1",
+        notes="h gate for na channel",
+        validate=False,
+    )
+    h_forward_rate = component_factory(
+        "HHRate", type="HHExpRate", rate="0.07per_ms", midpoint="-65mV", scale="-20mV"
+    )
+    h_reverse_rate = component_factory(
+        "HHRate", type="HHSigmoidRate", rate="1per_ms", midpoint="-35mV", scale="10mV"
+    )
+    gate_h.add(h_forward_rate, hint="forward_rate", validate=False)
+    gate_h.add(h_reverse_rate, hint="reverse_rate")
+    na_channel.add(gate_h)
+
+    na_channel_doc = component_factory(
+        "NeuroMLDocument", id="na_channel", notes="Na channel for HH neuron"
+    )
+    na_channel_fn = "HH_example_na_channel.nml"
+    na_channel_doc.add(na_channel)
+    na_channel_doc.validate(recursive=True)
+
+    write_neuroml2_file(
+        nml2_doc=na_channel_doc, nml2_file_name=na_channel_fn, validate=True
+    )
+
+    return na_channel_fn
+
+
 if __name__ == "__main__":
-    postprocess_GGM()
+    postprocess_GGN()
