@@ -7,9 +7,9 @@
 # Created: Thu Jun 30 10:27:20 2016 (-0400)
 # Version: 
 # Package-Requires: ()
-# Last-Updated: Fri Feb  9 11:49:50 2018 (-0500)
+# Last-Updated: Tue Apr  9 15:15:35 2024 (+0530)
 #           By: Subhasis Ray
-#     Update #: 84
+#     Update #: 89
 # URL: 
 # Doc URL: 
 # Keywords: 
@@ -31,7 +31,7 @@
 
 # Code:
 
-from __future__ import print_function
+
 import sys
 import os
 from datetime import datetime
@@ -44,6 +44,11 @@ nrn_version = subprocess.check_output(['nrniv', '--version']).strip()
 timestamp = datetime.utcnow()
 mypid = os.getpid()
 myjobid = os.environ.get('SLURM_JOBID', '0')
+
+# Create logging directory
+if not os.path.exists('log'):
+    os.mkdir('log')
+    print(f'Created log directory "{os.getcwd()}/log"')
 
 logfilename = 'log/mb_model_UTC{}-PID{}-JID{}.log'.format(
     timestamp.strftime('%Y_%m_%d__%H_%M_%S'), mypid, myjobid)
