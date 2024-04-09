@@ -7,8 +7,10 @@ Subhasis Ray, Zane Aldworth, and Mark Stopfer; 2020. eLife.
 
 
 # Running the simulations
-  For testing, run simulation scripts from the current directory. Edit the nrn/nrninit.sh (or nrninit.bat on Windows) with the path for this directory.    
-    - To simulate GGN in isolation to study signal attenuation with distance, run:
+  For testing, run simulation scripts from the current directory. Edit the nrn/nrninit.sh (or nrninit.bat on Windows) with the path for this directory. 
+  * You also have to build the NEURON mechanisms (.mod) files:
+  `nrnivmodl mb/mod`
+  * To simulate GGN in isolation to study signal attenuation with distance, run:
     `mb/test_cell/ggn_voltage_attenuation_vclamp.py`
 
 
