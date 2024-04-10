@@ -2,6 +2,7 @@
 <neuroml xmlns="http://www.neuroml.org/schema/neuroml2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2beta4.xsd" id="NeuroML_ionChannel">
 
     <notes>NeuroML file containing a single ion channel</notes>
+    <include href="RaySigmoid.nml" />
 
     <ionChannel id="kv" conductance="1pS" type="ionChannelHH" species="k">
 
@@ -12,47 +13,9 @@
 
         <!-- custom component types because the tables in the mod files only go to 40 -->
         <gate id="m" type="gateHHtauInf" instances="4">
-            <steadyState type="Ray_kv_minf"/>
-            <timeCourse type="Ray_kv_taum"/>
+            <steadyState type="Ray_inf" rate="1.0" midpoint="-37.6mV" scale="27.24mV"/>
+            <timeCourse type="Ray_tau" min_tau="1.85 per_s" max_tau="3.53 per_s" midpoint="45.0 mV" scale="-13.71mV"/>
         </gate>
 
     </ionChannel>
-
-    <ComponentType name="Ray_kv_minf"
-        extends="baseVoltageDepVariable"
-        description="Inf parameter to describe kv" >
-
-        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
-        <Constant name="rate" dimension="per_time" value="1.0 per_s"/>
-        <Constant name="midpoint" dimension="voltage" value="-37.6mV"/>
-        <Constant name="scale" dimension="voltage" value="27.24mV"/>
-        <Dynamics>
-            <DerivedVariable name="V" dimension="voltage" value="v/VOLT_SCALE" />
-
-            <ConditionalDerivedVariable name="x" dimension="per_time" exposure="x">
-                <Case condition="V .gt. 40" value="x"/>
-                <Case value="(rate / (1 + exp(0 - (v - midpoint) / scale)))"/>
-            </ConditionalDerivedVariable>
-
-        </Dynamics>
-    </ComponentType>
-
-     <ComponentType name="Ray_kv_taum"
-                   extends="baseVoltageDepTime"
-                   description="Tau parameter to describe kv">
-
-        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
-        <Constant name="max_tau" dimension="per_time" value="3.53 per_s"/>
-        <Constant name="min_tau" dimension="per_time" value="1.85 per_s"/>
-        <Dynamics>
-            <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
-            <ConditionalDerivedVariable name="t" dimension="per_time" exposure="t" >
-                <Case condition="V .gt. 40" value="(max_tau - min_tau) / (1 + exp((40.0 - 45.0) / 13.71)) + min_tau"/>
-                <Case value="(max_tau - min_tau) / (1 + exp((V - 45.0) / 13.71)) + min_tau"/>
-            </ConditionalDerivedVariable>
-
-        </Dynamics>
-
-    </ComponentType>
-
 </neuroml>
