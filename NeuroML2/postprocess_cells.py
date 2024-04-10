@@ -157,6 +157,16 @@ def postprocess_KC():
         ion="k",
         ion_chan_def_file="channels/ka.channel.nml",
     )
+    cell.add_channel_density(
+        nml_cell_doc=celldoc,
+        cd_id="kst",
+        ion_channel="kst",
+        cond_density="2.0275e-3 S_per_cm2",
+        erev="-81 mV",
+        group_id="all",
+        ion="k",
+        ion_chan_def_file="channels/kst.channel.nml",
+    )
 
     # L1 validation
     # cell.validate(recursive=True)
@@ -167,3 +177,4 @@ def postprocess_KC():
 
 if __name__ == "__main__":
     postprocess_GGN()
+    postprocess_KC()
