@@ -2,6 +2,7 @@
 <neuroml xmlns="http://www.neuroml.org/schema/neuroml2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2beta4.xsd" id="NeuroML_ionChannel">
 
     <notes>NeuroML file containing a single ion channel</notes>
+    <include href="RaySigmoid.nml" />
 
     <ionChannel id="ka" conductance="1pS" type="ionChannelHH" species="k">
 
@@ -12,37 +13,18 @@
 
         <!-- custom component types because the tables in the mod files only go to 40 -->
         <gate id="m" type="gateHHtauInf" instances="3">
-            <steadyState type="Ray_ka_minf"/>
+            <steadyState type="Ray_inf" rate="1.0" midpoint="-20.1mV" scale="16.1mV"/>
             <timeCourse type="Ray_ka_taum"/>
         </gate>
 
         <gate id="h" type="gateHHtauInf" instances="1">
-            <steadyState type="Ray_ka_hinf"/>
+            <steadyState type="Ray_inf" rate="1.0" midpoint="-74.7mV" scale="-7.0mV"/>
             <timeCourse type="Ray_ka_tauh"/>
         </gate>
 
     </ionChannel>
 
-    <ComponentType name="Ray_ka_minf"
-        extends="baseVoltageDepVariable"
-        description="Inf parameter to describe ka" >
-
-        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
-        <Constant name="rate" dimension="per_time" value="1.0 per_s"/>
-        <Constant name="midpoint" dimension="voltage" value="-20.1mV"/>
-        <Constant name="scale" dimension="voltage" value="16.1mV"/>
-        <Dynamics>
-            <DerivedVariable name="V" dimension="voltage" value="v/VOLT_SCALE" />
-
-            <ConditionalDerivedVariable name="x" dimension="per_time" exposure="x">
-                <Case condition="V .gt. 40" value="x"/>
-                <Case value="(rate / (1 + exp(0 - (v - midpoint) / scale)))"/>
-            </ConditionalDerivedVariable>
-
-        </Dynamics>
-    </ComponentType>
-
-     <ComponentType name="Ray_ka_taum"
+    <ComponentType name="Ray_ka_taum"
                    extends="baseVoltageDepTime"
                    description="Tau parameter to describe ka">
 
@@ -59,25 +41,6 @@
             </ConditionalDerivedVariable>
         </Dynamics>
 
-    </ComponentType>
-
-    <ComponentType name="Ray_ka_hinf"
-        extends="baseVoltageDepVariable"
-        description="Inf parameter to describe ka" >
-
-        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
-        <Constant name="rate" dimension="per_time" value="1.0 per_s"/>
-        <Constant name="midpoint" dimension="voltage" value="-74.7mV"/>
-        <Constant name="scale" dimension="voltage" value="-7.0mV"/>
-        <Dynamics>
-            <DerivedVariable name="V" dimension="voltage" value="v/VOLT_SCALE" />
-
-            <ConditionalDerivedVariable name="x" dimension="per_time" exposure="x">
-                <Case condition="V .gt. 40" value="x"/>
-                <Case value="(rate / (1 + exp(0 - (v - midpoint) / scale)))"/>
-            </ConditionalDerivedVariable>
-
-        </Dynamics>
     </ComponentType>
 
     <ComponentType name="Ray_ka_tauh"
