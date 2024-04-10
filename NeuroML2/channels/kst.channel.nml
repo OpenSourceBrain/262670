@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<neuroml xmlns="http://www.neuroml.org/schema/neuroml2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2beta4.xsd" id="NeuroML_ionChannel">
+
+    <notes>NeuroML file containing a single ion channel</notes>
+    <include href="RaySigmoid.nml" />
+
+    <ionChannel id="kst" conductance="1pS" type="ionChannelHH" species="k">
+
+        <notes>
+            NEURON implementation of slow transient K+ channel ( KST ) from Wustenberg DG, Boytcheva M, Grunewald B, Byrne JH, Menzel R, Baxter DA
+
+            This is slow transient K+ channel in Apis mellifera Kenyon cells (cultured).
+        </notes>
+
+        <gate id="m" type="gateHHtauInf" instances="3">
+            <steadyState type="Ray_inf" rate="1" midpoint="-20.1mV" scale="16.1mV"/>
+            <timeCourse type="Ray_tau" min_tau="0.5 per_s" max_tau="5.0 per_s" midpoint="20.0 mV" scale="-20.0mV"/>
+        </gate>
+
+        <gate id="h" type="gateHHtauInf" instances="1">
+            <steadyState type="Ray_inf" rate="1" midpoint="-74.7mV" scale="-7.0mV"/>
+            <timeCourse type="Ray_tau" min_tau="150.0 per_s" max_tau="200.0 per_s" midpoint="52.0 mV" scale="-15.0mV"/>
+        </gate>
+    </ionChannel>
+</neuroml>

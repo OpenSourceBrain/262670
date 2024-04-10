@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<neuroml xmlns="http://www.neuroml.org/schema/neuroml2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2beta4.xsd" id="NeuroML_ionChannel">
+
+    <notes>NeuroML file containing a single ion channel</notes>
+    <include href="RaySigmoid.nml" />
+
+    <ionChannel id="kv" conductance="1pS" type="ionChannelHH" species="k">
+
+        <notes>
+                Implementation of A type K+ channel ( KV ) from Wustenberg DG, Boytcheva M, Grunewald B, Byrne JH, Menzel R, Baxter DA.
+                This is a delayed rectifier type K+ channel in Apis mellifera Kenyon cells (cultured).
+        </notes>
+
+        <!-- custom component types because the tables in the mod files only go to 40 -->
+        <gate id="m" type="gateHHtauInf" instances="4">
+            <steadyState type="Ray_inf" rate="1.0" midpoint="-37.6mV" scale="27.24mV"/>
+            <timeCourse type="Ray_tau" min_tau="1.85 per_s" max_tau="3.53 per_s" midpoint="45.0 mV" scale="-13.71mV"/>
+        </gate>
+
+    </ionChannel>
+</neuroml>

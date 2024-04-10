@@ -1,0 +1,39 @@
+<neuroml xmlns="http://www.neuroml.org/schema/neuroml2"  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2.3.xsd" id="KC_doc">
+    <include href="channels/pas.channel.nml"/>
+    <include href="channels/nas.channel.nml"/>
+    <include href="channels/naf.channel.nml"/>
+    <include href="channels/kv.channel.nml"/>
+    <include href="channels/ka.channel.nml"/>
+    <include href="channels/kst.channel.nml"/>
+    <cell id="KC">
+        <morphology id="morphology">
+            <segment id="0" name="Seg0">
+                <proximal x="0.0" y="0.0" z="0.0" diameter="20.0"/>
+                <distal x="0.0" y="0.0" z="6.366" diameter="20.0"/>
+            </segment>
+            <segmentGroup id="soma_group" neuroLexId="GO:0043025">
+                <notes>Default soma segment group for the cell</notes>
+                <member segment="0"/>
+            </segmentGroup>
+            <segmentGroup id="all">
+                <notes>Default segment group for all segments in the cell</notes>
+                <member segment="0"/>
+            </segmentGroup>
+        </morphology>
+        <biophysicalProperties id="biophys">
+            <membraneProperties>
+                <channelDensity id="pas" ionChannel="pas" condDensity=".0000975 S_per_cm2" erev="-70 mV" ion="non_specific"/>
+                <channelDensity id="nas" ionChannel="nas" condDensity="3e-3 S_per_cm2" erev="-58 mV" ion="na"/>
+                <channelDensity id="naf" ionChannel="naf" condDensity="3.5e-2 S_per_cm2" erev="-58 mV" ion="na"/>
+                <channelDensity id="kv" ionChannel="kv" condDensity="1.5e-3 S_per_cm2" erev="-81 mV" ion="k"/>
+                <channelDensity id="ka" ionChannel="ka" condDensity="1.4525e-2 S_per_cm2" erev="-81 mV" ion="k"/>
+                <channelDensity id="kst" ionChannel="kst" condDensity="2.0275e-3 S_per_cm2" erev="-81 mV" ion="k"/>
+                <specificCapacitance value="1 uF_per_cm2"/>
+                <initMembPotential value="-80mV"/>
+            </membraneProperties>
+            <intracellularProperties>
+                <resistivity value="35.4 ohm_cm"/>
+            </intracellularProperties>
+        </biophysicalProperties>
+    </cell>
+</neuroml>
