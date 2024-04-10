@@ -10,17 +10,37 @@
                 This is transient A type K+ channel in Apis mellifera Kenyon cells (cultured).
         </notes>
 
+        <!-- custom component types because the tables in the mod files only go to 40 -->
         <gate id="m" type="gateHHtauInf" instances="3">
-            <steadyState type="HHSigmoidVariable" rate="1" midpoint="-20.1mV" scale="16.1mV"/>
+            <steadyState type="Ray_ka_minf"/>
             <timeCourse type="Ray_ka_taum"/>
         </gate>
 
         <gate id="h" type="gateHHtauInf" instances="1">
-            <steadyState type="HHSigmoidVariable" rate="1" midpoint="-74.7mV" scale="-7mV"/>
+            <steadyState type="Ray_ka_hinf"/>
             <timeCourse type="Ray_ka_tauh"/>
         </gate>
 
     </ionChannel>
+
+    <ComponentType name="Ray_ka_minf"
+        extends="baseVoltageDepVariable"
+        description="Inf parameter to describe ka" >
+
+        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
+        <Constant name="rate" dimension="per_time" value="1.0 per_s"/>
+        <Constant name="midpoint" dimension="voltage" value="-20.1mV"/>
+        <Constant name="scale" dimension="voltage" value="16.1mV"/>
+        <Dynamics>
+            <DerivedVariable name="V" dimension="voltage" value="v/VOLT_SCALE" />
+
+            <ConditionalDerivedVariable name="x" dimension="per_time" exposure="x">
+                <Case condition="V .gt. 40" value="x"/>
+                <Case value="(rate / (1 + exp(0 - (v - midpoint) / scale)))"/>
+            </ConditionalDerivedVariable>
+
+        </Dynamics>
+    </ComponentType>
 
      <ComponentType name="Ray_ka_taum"
                    extends="baseVoltageDepTime"
@@ -32,10 +52,32 @@
         <Constant name="min_tau" dimension="per_time" value="0.35 per_s"/>
         <Dynamics>
             <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
-            <DerivedVariable name="t" dimension="per_time" exposure="t" value="(max_tau - min_tau) / ((1 + exp(-(V + 70.0) / 4.0)) * ( 1 + exp((v + 2.0) / 12.0))) + min_tau"/>
+            <ConditionalDerivedVariable name="t" dimension="per_time" exposure="t" >
+                <Case condition="V .gt. 40" value="(max_tau - min_tau) / ((1 + exp(-(40. + 70.0) / 4.0)) * ( 1 + exp((40. + 2.0) / 12.0))) + min_tau"/>
+                <Case value="(max_tau - min_tau) / ((1 + exp(-(V + 70.0) / 4.0)) * ( 1 + exp((V + 2.0) / 12.0))) + min_tau"/>
 
+            </ConditionalDerivedVariable>
         </Dynamics>
 
+    </ComponentType>
+
+    <ComponentType name="Ray_ka_hinf"
+        extends="baseVoltageDepVariable"
+        description="Inf parameter to describe ka" >
+
+        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
+        <Constant name="rate" dimension="per_time" value="1.0 per_s"/>
+        <Constant name="midpoint" dimension="voltage" value="-74.7mV"/>
+        <Constant name="scale" dimension="voltage" value="-7.0mV"/>
+        <Dynamics>
+            <DerivedVariable name="V" dimension="voltage" value="v/VOLT_SCALE" />
+
+            <ConditionalDerivedVariable name="x" dimension="per_time" exposure="x">
+                <Case condition="V .gt. 40" value="x"/>
+                <Case value="(rate / (1 + exp(0 - (v - midpoint) / scale)))"/>
+            </ConditionalDerivedVariable>
+
+        </Dynamics>
     </ComponentType>
 
     <ComponentType name="Ray_ka_tauh"
@@ -48,7 +90,10 @@
         <Constant name="min_tau" dimension="per_time" value="2.5 per_s"/>
         <Dynamics>
             <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
-            <DerivedVariable name="t" dimension="per_time" exposure="t" value="(max_tau - min_tau) / ((1 + exp(-(V + 60.) / 25.0)) * (1 + exp((V + 62.0) / 16.0))) + min_tau"/>
+            <ConditionalDerivedVariable name="t" dimension="per_time" exposure="t" >
+                <Case condition="V .gt. 40" value="(max_tau - min_tau) / ((1 + exp(-(40. + 60.) / 25.0)) * (1 + exp((40. + 62.0) / 16.0))) + min_tau"/>
+                <Case value="(max_tau - min_tau) / ((1 + exp(-(V + 60.) / 25.0)) * (1 + exp((V + 62.0) / 16.0))) + min_tau"/>
+            </ConditionalDerivedVariable>
 
         </Dynamics>
 

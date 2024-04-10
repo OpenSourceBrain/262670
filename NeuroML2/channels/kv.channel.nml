@@ -10,6 +10,7 @@
                 This is a delayed rectifier type K+ channel in Apis mellifera Kenyon cells (cultured).
         </notes>
 
+        <!-- custom component types because the tables in the mod files only go to 40 -->
         <gate id="m" type="gateHHtauInf" instances="4">
             <steadyState type="Ray_kv_minf"/>
             <timeCourse type="Ray_kv_taum"/>
