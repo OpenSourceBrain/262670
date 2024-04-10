@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<neuroml xmlns="http://www.neuroml.org/schema/neuroml2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2beta4.xsd" id="NeuroML_ionChannel">
+
+    <notes>NeuroML file containing a single ion channel</notes>
+
+    <ionChannel id="ka" conductance="1pS" type="ionChannelHH" species="k">
+
+        <notes>
+                Implementation of A type K+ channel ( KA ) from Wustenberg DG, Boytcheva M, Grunewald B, Byrne JH, Menzel R, Baxter DA.
+                This is transient A type K+ channel in Apis mellifera Kenyon cells (cultured).
+        </notes>
+
+        <gate id="m" type="gateHHtauInf" instances="3">
+            <steadyState type="HHSigmoidVariable" rate="1" midpoint="-20.1mV" scale="16.1mV"/>
+            <timeCourse type="Ray_ka_taum"/>
+        </gate>
+
+        <gate id="h" type="gateHHtauInf" instances="1">
+            <steadyState type="HHSigmoidVariable" rate="1" midpoint="-74.7mV" scale="-7mV"/>
+            <timeCourse type="Ray_ka_tauh"/>
+        </gate>
+
+    </ionChannel>
+
+     <ComponentType name="Ray_ka_taum"
+                   extends="baseVoltageDepTime"
+                   description="Tau parameter to describe ka">
+
+        <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
+        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
+        <Constant name="max_tau" dimension="per_time" value="1.65 per_s"/>
+        <Constant name="min_tau" dimension="per_time" value="0.35 per_s"/>
+        <Dynamics>
+            <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
+            <DerivedVariable name="t" dimension="per_time" exposure="t" value="(max_tau - min_tau) / ((1 + exp(-(V + 70.0) / 4.0)) * ( 1 + exp((v + 2.0) / 12.0))) + min_tau"/>
+
+        </Dynamics>
+
+    </ComponentType>
+
+    <ComponentType name="Ray_ka_tauh"
+                   extends="baseVoltageDepTime"
+                   description="Tau parameter to describe ka">
+
+        <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
+        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
+        <Constant name="max_tau" dimension="per_time" value="90.0 per_s"/>
+        <Constant name="min_tau" dimension="per_time" value="2.5 per_s"/>
+        <Dynamics>
+            <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
+            <DerivedVariable name="t" dimension="per_time" exposure="t" value="(max_tau - min_tau) / ((1 + exp(-(V + 60.) / 25.0)) * (1 + exp((V + 62.0) / 16.0))) + min_tau"/>
+
+        </Dynamics>
+
+    </ComponentType>
+
+</neuroml>
