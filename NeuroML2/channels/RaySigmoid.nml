@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<neuroml xmlns="http://www.neuroml.org/schema/neuroml2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2beta4.xsd" id="NeuroML_ionChannel">
+
+    <notes>NeuroML file containing variations of steady state and tau expressions for ion channels used in Ray et al 2020. These are required because in the mod files, the tables stop at 40, and so we need to tweak our implementations.</notes>
+
+    <ComponentType name="Ray_inf"
+        extends="baseVoltageDepVariable"
+        description="Inf parameter to describe naf" >
+
+        <Constant name="TIME_SCALE" dimension="time" value="1 s"/>
+        <Constant name="table_max" dimension="voltage" value="40 mV"/>
+        <Parameter name="rate" dimension="none"/>
+        <Parameter name="midpoint" dimension="voltage"/>
+        <Parameter name="scale" dimension="voltage"/>
+        <Dynamics>
+            <ConditionalDerivedVariable name="x" dimension="per_time" exposure="x">
+                <Case condition="v .gt. table_max" value="(rate / (1 + exp(0 - (table_max - midpoint) / scale)))/TIME_SCALE"/>
+                <Case value="(rate / (1 + exp(0 - (v - midpoint) / scale)))/TIME_SCALE"/>
+            </ConditionalDerivedVariable>
+        </Dynamics>
+    </ComponentType>
+
+     <ComponentType name="Ray_tau"
+                   extends="baseVoltageDepTime"
+                   description="Tau parameter to describe naf">
+
+        <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
+        <Constant name="table_max" dimension="voltage" value="40 mV"/>
+        <Parameter name="max_tau" dimension="per_time"/>
+        <Parameter name="min_tau" dimension="per_time"/>
+        <Parameter name="midpoint" dimension="voltage"/>
+        <Parameter name="scale" dimension="voltage"/>
+        <Dynamics>
+            <ConditionalDerivedVariable name="t" dimension="per_time" exposure="t" >
+                <Case condition="v .gt. table_max" value="((max_tau - min_tau) / (1 + exp(0 - (table_max - midpoint) / scale))) + min_tau"/>
+                <Case value="((max_tau - min_tau) / (1 + exp(0 - (v - midpoint) / scale))) + min_tau"/>
+            </ConditionalDerivedVariable>
+
+        </Dynamics>
+
+    </ComponentType>
+</neuroml>
