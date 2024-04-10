@@ -4,22 +4,23 @@
     <notes>NeuroML file containing a single ion channel</notes>
     <include href="RaySigmoid.nml" />
 
-    <ionChannel id="Nas" conductance="1pS" type="ionChannelHH" species="na">
+    <ionChannel id="naf" conductance="1pS" type="ionChannelHH" species="na">
 
         <notes>
-            Implementation of slow Na+ channel ( NAS ) from Wustenberg DG, Boytcheva M, Grunewald B, Byrne JH, Menzel R, Baxter DA
+            Implementation of fast Na+ channel ( NAF ) from Wustenberg DG, Boytcheva M, Grunewald B, Byrne JH, Menzel R, Baxter DA
 
-            This is slow Na+ channel in Apis mellifera Kenyon cells :(cultured).
+            This is fast Na+ channel in Apis mellifera Kenyon cells :(cultured).
         </notes>
 
         <gate id="m" type="gateHHtauInf" instances="3">
-            <steadyState type="Ray_inf" rate="1" midpoint="-30.1mV" scale="6.65mV"/>
+            <steadyState type="Ray_inf" rate="1.0" midpoint="-30.1mV" scale="6.65mV"/>
             <timeCourse type="Ray_tau" min_tau="0.83 per_s" max_tau="0.093 per_s" midpoint="-20.3 mV" scale="6.45mV"/>
         </gate>
 
         <gate id="h" type="gateHHtauInf" instances="1">
-            <steadyState type="Ray_inf" rate="1" midpoint="-51.4mV" scale="-5.9mV"/>
-            <timeCourse type="Ray_tau" min_tau="1.9 per_s" max_tau="12.24 per_s" midpoint="-32.6 mV" scale="-8.0mV"/>
+            <steadyState type="Ray_inf" rate="1.0" midpoint="-51.4mV" scale="-5.9mV"/>
+            <timeCourse type="Ray_tau" min_tau="0.12 per_s" max_tau="1.660 per_s" midpoint="-8.03 mV" scale="-8.69mV"/>
         </gate>
+
     </ionChannel>
 </neuroml>
