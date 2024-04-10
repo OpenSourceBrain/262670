@@ -4,7 +4,7 @@
     <notes>NeuroML file containing a single ion channel</notes>
     <include href="RaySigmoid.nml" />
 
-    <ionChannel id="Nas" conductance="1pS" type="ionChannelHH" species="na">
+    <ionChannel id="nas" conductance="1pS" type="ionChannelHH" species="na">
 
         <notes>
             Implementation of slow Na+ channel ( NAS ) from Wustenberg DG, Boytcheva M, Grunewald B, Byrne JH, Menzel R, Baxter DA

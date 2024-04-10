@@ -4,7 +4,7 @@
     <notes>NeuroML file containing a single ion channel</notes>
     <include href="RaySigmoid.nml" />
 
-    <ionChannel id="Kst" conductance="1pS" type="ionChannelHH" species="k">
+    <ionChannel id="kst" conductance="1pS" type="ionChannelHH" species="k">
 
         <notes>
             NEURON implementation of slow transient K+ channel ( KST ) from Wustenberg DG, Boytcheva M, Grunewald B, Byrne JH, Menzel R, Baxter DA
