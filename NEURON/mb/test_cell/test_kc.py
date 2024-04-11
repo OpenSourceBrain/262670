@@ -31,6 +31,7 @@ h.xopen(filename)
 kc = eval(f'h.{cellname}()')
 delay = Q_(100, 'ms')
 duration=Q_(500.0, 'ms')
+postdelay=Q_(100.0, 'ms')
 inj_current = Q_(16, 'pA')
 clamp = ephys.setup_current_clamp(kc.soma, delay=delay, duration=duration, amplitude=inj_current)
 
@@ -43,7 +44,7 @@ im_vec.record(clamp._ref_i)
 tvec = h.Vector()
 tvec.record(h._ref_t)
 
-h.tstop = delay.to('ms').m + duration.to('ms').m
+h.tstop = delay.to('ms').m + duration.to('ms').m + postdelay.to('ms').m
 h.v_init = Em.to('mV').m
 h.init()
 h.run()
