@@ -44,6 +44,12 @@ im_vec.record(clamp._ref_i)
 tvec = h.Vector()
 tvec.record(h._ref_t)
 
+# record spikes
+apcvec = h.Vector()
+apc = h.APCount(0.5)
+apc.thresh = -10
+apc.record(apcvec)
+
 h.tstop = delay.to('ms').m + duration.to('ms').m + postdelay.to('ms').m
 h.v_init = Em.to('mV').m
 h.init()
@@ -59,6 +65,8 @@ axes[1].set_ylabel('Im (nA)')
 data = np.array([t.to('s').m, np.array(vvec.x)], dtype=[('t', float), ('v', float)])
 data_file = 'kc_vm.npy'
 np.save(data_file, data)
+
+print(list(apcvec))
 
 print(f'Simulated {cellname} from template file {filename}.')
 print(f'Settling time {delay} followed by {inj_current} current injection for {duration}')
