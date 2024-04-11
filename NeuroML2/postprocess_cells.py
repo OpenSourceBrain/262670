@@ -15,7 +15,9 @@ import random
 
 import neuroml
 from neuroml.loaders import read_neuroml2_file
-from pyneuroml.pynml import write_neuroml2_file
+from pyneuroml.pynml import write_neuroml2_file, run_lems_with_jneuroml_neuron
+from pyneuroml.lems import generate_lems_file_for_neuroml
+from pyneuroml.plot import generate_plot
 from neuroml.utils import component_factory
 
 random.seed(1412)
@@ -96,47 +98,30 @@ def postprocess_GGN():
 
 def postprocess_KC():
     """Manually create KC and add biophysics."""
-    celldoc = component_factory("NeuroMLDocument", id="KC_doc")  # type: neuroml.NeuroMLDocument
+    celldoc = component_factory(
+        "NeuroMLDocument", id="KC_doc"
+    )  # type: neuroml.NeuroMLDocument
     cell = celldoc.add("Cell", id="KC", validate=False)  # type: neuroml.Cell
     cell.setup_nml_cell()
     cell.add_segment([0, 0, 0, 20], [0, 0, 6.366, 20], seg_type="soma")
 
     # biophysics
     # all
+    cell.set_resistivity("35.4 ohm_cm", group_id="all")
+    cell.set_specific_capacitance("1 uF_per_cm2", group_id="all")
+    cell.set_init_memb_potential("-70mV")
+
     cell.add_channel_density(
         nml_cell_doc=celldoc,
         cd_id="pas",
         ion_channel="pas",
-        cond_density=".0000975 S_per_cm2",
+        cond_density="9.75e-5 S_per_cm2",
         erev="-70 mV",
         group_id="all",
         ion="non_specific",
         ion_chan_def_file="channels/pas.channel.nml",
     )
-    cell.set_resistivity("35.4 ohm_cm", group_id="all")
-    cell.set_specific_capacitance("1 uF_per_cm2", group_id="all")
-    cell.set_init_memb_potential("-80mV")
 
-    cell.add_channel_density(
-        nml_cell_doc=celldoc,
-        cd_id="nas",
-        ion_channel="nas",
-        cond_density="3e-3 S_per_cm2",
-        erev="-58 mV",
-        group_id="all",
-        ion="na",
-        ion_chan_def_file="channels/nas.channel.nml",
-    )
-    cell.add_channel_density(
-        nml_cell_doc=celldoc,
-        cd_id="naf",
-        ion_channel="naf",
-        cond_density="3.5e-2 S_per_cm2",
-        erev="-58 mV",
-        group_id="all",
-        ion="na",
-        ion_chan_def_file="channels/naf.channel.nml",
-    )
     cell.add_channel_density(
         nml_cell_doc=celldoc,
         cd_id="kv",
@@ -146,6 +131,28 @@ def postprocess_KC():
         group_id="all",
         ion="k",
         ion_chan_def_file="channels/kv.channel.nml",
+    )
+
+    """
+    cell.add_channel_density(
+        nml_cell_doc=celldoc,
+        cd_id="nas",
+        ion_channel="nas",
+        cond_density="3e-3 S_per_cm2",
+        erev="58 mV",
+        group_id="all",
+        ion="na",
+        ion_chan_def_file="channels/nas.channel.nml",
+    )
+    cell.add_channel_density(
+        nml_cell_doc=celldoc,
+        cd_id="naf",
+        ion_channel="naf",
+        cond_density="3.5e-2 S_per_cm2",
+        erev="58 mV",
+        group_id="all",
+        ion="na",
+        ion_chan_def_file="channels/naf.channel.nml",
     )
     cell.add_channel_density(
         nml_cell_doc=celldoc,
@@ -167,6 +174,7 @@ def postprocess_KC():
         ion="k",
         ion_chan_def_file="channels/kst.channel.nml",
     )
+    """
 
     # L1 validation
     # cell.validate(recursive=True)
@@ -175,6 +183,61 @@ def postprocess_KC():
     write_neuroml2_file(celldoc, "KC.cell.nml")
 
 
+def step_current_omv_kc():
+    """Create a step current simulation OMV LEMS file"""
+    # read the cell file, modify it, write a new one
+    netdoc = read_neuroml2_file("KC.cell.nml")
+    kc_cell = netdoc.cells[0]
+    net = netdoc.add(neuroml.Network, id="KC_net", validate=False)
+    pop = net.add(neuroml.Population, id="KC_pop", component=kc_cell.id, size=1)
+
+    # should be same as test_kc.py
+    pg = netdoc.add(
+        neuroml.PulseGenerator(
+            id="pg", delay="100ms", duration="500ms",
+            amplitude="16pA"
+        )
+    )
+
+    # Add these to cells
+    input_list = net.add(
+        neuroml.InputList(id="input_list", component=pg.id, populations=pop.id)
+    )
+    aninput = input_list.add(
+        neuroml.Input(
+            id="0",
+            target="../%s[0]" % (pop.id),
+            destination="synapses",
+            segment_id="0",
+        )
+    )
+    write_neuroml2_file(netdoc, "KC.net.nml")
+
+    generate_lems_file_for_neuroml(
+        sim_id="KC_step_test",
+        target=net.id,
+        neuroml_file="KC.net.nml",
+        duration="700ms",
+        dt="0.01ms",
+        lems_file_name="LEMS_KC_step_test.xml",
+        nml_doc=netdoc,
+        gen_spike_saves_for_all_somas=True,
+        target_dir=".",
+    )
+
+    data = run_lems_with_jneuroml_neuron(
+        "LEMS_KC_step_test.xml", load_saved_data=True, compile_mods=True
+    )
+
+    # print(data)
+    generate_plot(
+        xvalues=[data["t"]],
+        yvalues=[data["KC_pop[0]/v"]],
+        title="Membrane potential: KC",
+    )
+
+
 if __name__ == "__main__":
-    postprocess_GGN()
+    # postprocess_GGN()
     postprocess_KC()
+    step_current_omv_kc()

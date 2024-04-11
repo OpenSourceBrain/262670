@@ -28,4 +28,11 @@
             </intracellularProperties>
         </biophysicalProperties>
     </cell>
+    <pulseGenerator id="pg" delay="100ms" duration="500ms" amplitude="16pA"/>
+    <network id="KC_net">
+        <population id="KC_pop" component="KC" size="1"/>
+        <inputList id="input_list" population="KC_pop" component="pg">
+            <input id="0" target="../KC_pop[0]" destination="synapses" segmentId="0"/>
+        </inputList>
+    </network>
 </neuroml>
