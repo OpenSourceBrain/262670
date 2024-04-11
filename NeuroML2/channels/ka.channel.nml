@@ -28,15 +28,17 @@
                    extends="baseVoltageDepTime"
                    description="Tau parameter to describe ka">
 
-        <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
-        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
-        <Constant name="max_tau" dimension="per_time" value="1.65 per_s"/>
-        <Constant name="min_tau" dimension="per_time" value="0.35 per_s"/>
+        <Constant name="max_tau" dimension="time" value="1.65 ms"/>
+        <Constant name="min_tau" dimension="time" value="0.35 ms"/>
+        <Constant name="table_max" dimension="voltage" value="40 mV"/>
+        <Constant name="midpoint1" dimension="voltage" value="70 mV"/>
+        <Constant name="scale1" dimension="voltage" value="4.0 mV"/>
+        <Constant name="midpoint2" dimension="voltage" value="2.0 mV"/>
+        <Constant name="scale2" dimension="voltage" value="12.0 mV"/>
         <Dynamics>
-            <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
-            <ConditionalDerivedVariable name="t" dimension="per_time" exposure="t" >
-                <Case condition="V .gt. 40" value="(max_tau - min_tau) / ((1 + exp(-(40. + 70.0) / 4.0)) * ( 1 + exp((40. + 2.0) / 12.0))) + min_tau"/>
-                <Case value="(max_tau - min_tau) / ((1 + exp(-(V + 70.0) / 4.0)) * ( 1 + exp((V + 2.0) / 12.0))) + min_tau"/>
+            <ConditionalDerivedVariable name="t" dimension="time" exposure="t" >
+                <Case condition="v .gt. table_max" value="(max_tau - min_tau) / ((1 + exp(-(table_max + midpoint1) / scale1)) * ( 1 + exp((table_max + midpoint2) / scale2))) + min_tau"/>
+                <Case value="(max_tau - min_tau) / ((1 + exp(-(v + midpoint1) / scale1)) * ( 1 + exp((v + midpoint2) / scale2))) + min_tau"/>
 
             </ConditionalDerivedVariable>
         </Dynamics>
@@ -47,15 +49,17 @@
                    extends="baseVoltageDepTime"
                    description="Tau parameter to describe ka">
 
-        <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
-        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
-        <Constant name="max_tau" dimension="per_time" value="90.0 per_s"/>
-        <Constant name="min_tau" dimension="per_time" value="2.5 per_s"/>
+        <Constant name="max_tau" dimension="time" value="90.0 ms"/>
+        <Constant name="min_tau" dimension="time" value="2.5 ms"/>
+        <Constant name="table_max" dimension="voltage" value="40 mV"/>
+        <Constant name="midpoint1" dimension="voltage" value="60 mV"/>
+        <Constant name="scale1" dimension="voltage" value="25.0 mV"/>
+        <Constant name="midpoint2" dimension="voltage" value="62.0 mV"/>
+        <Constant name="scale2" dimension="voltage" value="16.0 mV"/>
         <Dynamics>
-            <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
-            <ConditionalDerivedVariable name="t" dimension="per_time" exposure="t" >
-                <Case condition="V .gt. 40" value="(max_tau - min_tau) / ((1 + exp(-(40. + 60.) / 25.0)) * (1 + exp((40. + 62.0) / 16.0))) + min_tau"/>
-                <Case value="(max_tau - min_tau) / ((1 + exp(-(V + 60.) / 25.0)) * (1 + exp((V + 62.0) / 16.0))) + min_tau"/>
+            <ConditionalDerivedVariable name="t" dimension="time" exposure="t" >
+                <Case condition="v .gt. table_max" value="(max_tau - min_tau) / ((1 + exp(-(table_max + midpoint1) / scale1)) * (1 + exp((table_max + midpoint2) / scale2))) + min_tau"/>
+                <Case value="(max_tau - min_tau) / ((1 + exp(-(v + midpoint1) / scale1)) * (1 + exp((v + midpoint2) / scale2))) + min_tau"/>
             </ConditionalDerivedVariable>
 
         </Dynamics>

@@ -24,16 +24,15 @@
                    extends="baseVoltageDepTime"
                    description="Tau parameter to describe naf">
 
-        <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
         <Constant name="table_max" dimension="voltage" value="40 mV"/>
-        <Parameter name="max_tau" dimension="per_time"/>
-        <Parameter name="min_tau" dimension="per_time"/>
+        <Parameter name="max_tau" dimension="time"/>
+        <Parameter name="min_tau" dimension="time"/>
         <Parameter name="midpoint" dimension="voltage"/>
         <Parameter name="scale" dimension="voltage"/>
         <Dynamics>
-            <ConditionalDerivedVariable name="t" dimension="per_time" exposure="t" >
+            <ConditionalDerivedVariable name="t" dimension="time" exposure="t" >
                 <Case condition="v .gt. table_max" value="((max_tau - min_tau) / (1 + exp(0 - (table_max - midpoint) / scale))) + min_tau"/>
-                <Case value="((max_tau - min_tau) / (1 + exp(0 - (v - midpoint) / scale))) + min_tau"/>
+                <Case value="(((max_tau - min_tau) / (1 + exp(0 - (v - midpoint) / scale))) + min_tau)"/>
             </ConditionalDerivedVariable>
 
         </Dynamics>

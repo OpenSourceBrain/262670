@@ -1,2 +1,5 @@
 *.dat
 x86_64/
+channels/*dat
+channels/LEMS*
+channels/*mod
