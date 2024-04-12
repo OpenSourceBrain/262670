@@ -7,7 +7,7 @@
         extends="baseVoltageDepVariable"
         description="Inf parameter to describe naf" >
 
-        <Constant name="TIME_SCALE" dimension="time" value="1 s"/>
+        <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
         <Constant name="table_max" dimension="voltage" value="40 mV"/>
         <Parameter name="rate" dimension="none"/>
         <Parameter name="midpoint" dimension="voltage"/>

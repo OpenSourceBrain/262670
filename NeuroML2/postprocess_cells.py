@@ -13,11 +13,13 @@ Author: Ankur Sinha <sanjay DOT ankur AT gmail DOT com>
 
 import random
 
+import yaml
 import neuroml
 from neuroml.loaders import read_neuroml2_file
 from pyneuroml.pynml import write_neuroml2_file, run_lems_with_jneuroml_neuron
 from pyneuroml.lems import generate_lems_file_for_neuroml
 from pyneuroml.plot import generate_plot
+from pyneuroml.neuron import morphinfo, getinfo, load_hoc_or_python_file
 from neuroml.utils import component_factory
 
 random.seed(1412)
@@ -110,6 +112,7 @@ def postprocess_KC():
     cell.set_resistivity("35.4 ohm_cm", group_id="all")
     cell.set_specific_capacitance("1 uF_per_cm2", group_id="all")
     cell.set_init_memb_potential("-70mV")
+    cell.set_spike_thresh("-10mV")
 
     cell.add_channel_density(
         nml_cell_doc=celldoc,
@@ -122,6 +125,7 @@ def postprocess_KC():
         ion_chan_def_file="channels/pas.channel.nml",
     )
 
+    # K
     cell.add_channel_density(
         nml_cell_doc=celldoc,
         cd_id="kv",
@@ -131,28 +135,6 @@ def postprocess_KC():
         group_id="all",
         ion="k",
         ion_chan_def_file="channels/kv.channel.nml",
-    )
-
-    """
-    cell.add_channel_density(
-        nml_cell_doc=celldoc,
-        cd_id="nas",
-        ion_channel="nas",
-        cond_density="3e-3 S_per_cm2",
-        erev="58 mV",
-        group_id="all",
-        ion="na",
-        ion_chan_def_file="channels/nas.channel.nml",
-    )
-    cell.add_channel_density(
-        nml_cell_doc=celldoc,
-        cd_id="naf",
-        ion_channel="naf",
-        cond_density="3.5e-2 S_per_cm2",
-        erev="58 mV",
-        group_id="all",
-        ion="na",
-        ion_chan_def_file="channels/naf.channel.nml",
     )
     cell.add_channel_density(
         nml_cell_doc=celldoc,
@@ -174,7 +156,27 @@ def postprocess_KC():
         ion="k",
         ion_chan_def_file="channels/kst.channel.nml",
     )
-    """
+    # Na
+    cell.add_channel_density(
+        nml_cell_doc=celldoc,
+        cd_id="naf",
+        ion_channel="naf",
+        cond_density="3.5e-2 S_per_cm2",
+        erev="58 mV",
+        group_id="all",
+        ion="na",
+        ion_chan_def_file="channels/naf.channel.nml",
+    )
+    cell.add_channel_density(
+        nml_cell_doc=celldoc,
+        cd_id="nas",
+        ion_channel="nas",
+        cond_density="3e-3 S_per_cm2",
+        erev="58 mV",
+        group_id="all",
+        ion="na",
+        ion_chan_def_file="channels/nas.channel.nml",
+    )
 
     # L1 validation
     # cell.validate(recursive=True)
@@ -223,11 +225,17 @@ def step_current_omv_kc():
         nml_doc=netdoc,
         gen_spike_saves_for_all_somas=True,
         target_dir=".",
+        gen_saves_for_quantities={
+            "k.dat": ["KC_pop[0]/biophys/membraneProperties/kv/iDensity"]
+        },
+        copy_neuroml=False
     )
 
     data = run_lems_with_jneuroml_neuron(
         "LEMS_KC_step_test.xml", load_saved_data=True, compile_mods=True
     )
+
+    print(data.keys())
 
     # print(data)
     generate_plot(
@@ -237,7 +245,29 @@ def step_current_omv_kc():
     )
 
 
+def getcellinfo(cellname):
+    """Get info of cell from HOC
+
+    Used to match NeuroML hoc against original NEURON hoc.
+
+    :param cellname: TODO
+    :returns: TODO
+
+    """
+    from neuron import h
+    load_hoc_or_python_file(f"{cellname}.hoc")
+    h("celsius = 34")
+    h("objectvar mycell")
+    h("strdef reference")
+    h('reference = "acell"')
+    h(f'mycell = new {cellname}(reference, "{cellname}", "A cell")')
+    with open(f"NeuroML-info-{cellname}.yaml", "w") as f:
+        retval = getinfo(h.allsec())
+        print(yaml.dump(retval, sort_keys=True, indent=4), file=f, flush=True)
+
+
 if __name__ == "__main__":
     # postprocess_GGN()
     postprocess_KC()
     step_current_omv_kc()
+    # getcellinfo("KC")

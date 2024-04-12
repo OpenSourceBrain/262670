@@ -1,0 +1,45 @@
+<Lems>
+
+    <!-- 
+
+        This LEMS file has been automatically generated using PyNeuroML v1.2.8 (libNeuroML v0.5.9)
+
+     -->
+
+    <!-- Specify which component to run -->
+    <Target component="KC_step_test"/>
+
+    <!-- Include core NeuroML2 ComponentType definitions -->
+    <Include file="Cells.xml"/>
+    <Include file="Networks.xml"/>
+    <Include file="Simulation.xml"/>
+
+    <Include file="KC.net.nml"/>
+    <Include file="channels/pas.channel.nml"/>
+    <Include file="channels/kv.channel.nml"/>
+    <Include file="RaySigmoid.nml"/>
+    <Include file="channels/ka.channel.nml"/>
+    <Include file="channels/kst.channel.nml"/>
+    <Include file="channels/naf.channel.nml"/>
+    <Include file="channels/nas.channel.nml"/>
+
+    <Simulation id="KC_step_test" length="700.0ms" step="0.01ms" target="KC_net" seed="12345">  <!-- Note seed: ensures same random numbers used every run -->
+        <Display id="DispPop__KC_pop" title="Membrane potentials of cells in KC_pop" timeScale="1ms" xmin="-70.0" xmax="770.0000000000001" ymin="-90" ymax="50">
+            <Line id="KC_pop[0]: v" quantity="KC_pop[0]/v" scale="1mV" color="#d54f33" timeScale="1ms"/>
+        </Display>
+
+        <OutputFile id="Volts_file__KC_pop" fileName="KC_step_test.KC_pop.v.dat">
+            <OutputColumn id="v_KC_pop_0__v" quantity="KC_pop[0]/v"/>
+        </OutputFile>
+
+        <OutputFile id="k_dat" fileName="k.dat">
+            <OutputColumn id="KC_pop_0__biophys_membraneProperties_kv_iDensity" quantity="KC_pop[0]/biophys/membraneProperties/kv/iDensity"/>
+        </OutputFile>
+
+        <EventOutputFile id="Spikes_file__KC_pop" fileName="KC_step_test.KC_pop.spikes" format="ID_TIME">
+            <EventSelection id="0" select="KC_pop[0]" eventPort="spike"/>
+        </EventOutputFile>
+
+    </Simulation>
+
+</Lems>
