@@ -5,7 +5,7 @@
 
     <ComponentType name="Ray_inf"
         extends="baseVoltageDepVariable"
-        description="Inf parameter to describe naf" >
+        description="Inf parameter for Ray et al 2020" >
 
         <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
         <Constant name="table_max" dimension="voltage" value="40 mV"/>
@@ -22,7 +22,7 @@
 
      <ComponentType name="Ray_tau"
                    extends="baseVoltageDepTime"
-                   description="Tau parameter to describe naf">
+                   description="Tau parameter for Ray et al 2020">
 
         <Constant name="table_max" dimension="voltage" value="40 mV"/>
         <Parameter name="max_tau" dimension="time"/>
