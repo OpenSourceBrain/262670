@@ -5,7 +5,6 @@
     <include href="RaySigmoid.nml" />
 
     <ionChannel id="ka" conductance="1pS" type="ionChannelHH" species="k">
-
         <notes>
                 Implementation of A type K+ channel ( KA ) from Wustenberg DG, Boytcheva M, Grunewald B, Byrne JH, Menzel R, Baxter DA.
                 This is transient A type K+ channel in Apis mellifera Kenyon cells (cultured).
@@ -13,57 +12,13 @@
 
         <!-- custom component types because the tables in the mod files only go to 40 -->
         <gate id="m" type="gateHHtauInf" instances="3">
+            <timeCourse type="Ray_ka_tau" midpoint1="70mV" midpoint2="2.0mV" scale1="4.0mV" scale2="12.0mV" min_tau="0.35ms" max_tau="1.65ms"/>
             <steadyState type="Ray_inf" rate="1.0" midpoint="-20.1mV" scale="16.1mV"/>
-            <timeCourse type="Ray_ka_taum"/>
         </gate>
 
         <gate id="h" type="gateHHtauInf" instances="1">
+            <timeCourse type="Ray_ka_tau" midpoint1="60mV" midpoint2="62.0mV" scale1="25.0mV" scale2="16.0mV" min_tau="2.5ms" max_tau="90.0ms"/>
             <steadyState type="Ray_inf" rate="1.0" midpoint="-74.7mV" scale="-7.0mV"/>
-            <timeCourse type="Ray_ka_tauh"/>
         </gate>
-
     </ionChannel>
-
-    <ComponentType name="Ray_ka_taum"
-                   extends="baseVoltageDepTime"
-                   description="Tau parameter to describe ka">
-
-        <Constant name="max_tau" dimension="time" value="1.65 ms"/>
-        <Constant name="min_tau" dimension="time" value="0.35 ms"/>
-        <Constant name="table_max" dimension="voltage" value="40 mV"/>
-        <Constant name="midpoint1" dimension="voltage" value="70 mV"/>
-        <Constant name="scale1" dimension="voltage" value="4.0 mV"/>
-        <Constant name="midpoint2" dimension="voltage" value="2.0 mV"/>
-        <Constant name="scale2" dimension="voltage" value="12.0 mV"/>
-        <Dynamics>
-            <ConditionalDerivedVariable name="t" dimension="time" exposure="t" >
-                <Case condition="v .gt. table_max" value="(max_tau - min_tau) / ((1 + exp(-(table_max + midpoint1) / scale1)) * ( 1 + exp((table_max + midpoint2) / scale2))) + min_tau"/>
-                <Case value="(max_tau - min_tau) / ((1 + exp(-(v + midpoint1) / scale1)) * ( 1 + exp((v + midpoint2) / scale2))) + min_tau"/>
-
-            </ConditionalDerivedVariable>
-        </Dynamics>
-
-    </ComponentType>
-
-    <ComponentType name="Ray_ka_tauh"
-                   extends="baseVoltageDepTime"
-                   description="Tau parameter to describe ka">
-
-        <Constant name="max_tau" dimension="time" value="90.0 ms"/>
-        <Constant name="min_tau" dimension="time" value="2.5 ms"/>
-        <Constant name="table_max" dimension="voltage" value="40 mV"/>
-        <Constant name="midpoint1" dimension="voltage" value="60 mV"/>
-        <Constant name="scale1" dimension="voltage" value="25.0 mV"/>
-        <Constant name="midpoint2" dimension="voltage" value="62.0 mV"/>
-        <Constant name="scale2" dimension="voltage" value="16.0 mV"/>
-        <Dynamics>
-            <ConditionalDerivedVariable name="t" dimension="time" exposure="t" >
-                <Case condition="v .gt. table_max" value="(max_tau - min_tau) / ((1 + exp(-(table_max + midpoint1) / scale1)) * (1 + exp((table_max + midpoint2) / scale2))) + min_tau"/>
-                <Case value="(max_tau - min_tau) / ((1 + exp(-(v + midpoint1) / scale1)) * (1 + exp((v + midpoint2) / scale2))) + min_tau"/>
-            </ConditionalDerivedVariable>
-
-        </Dynamics>
-
-    </ComponentType>
-
 </neuroml>
