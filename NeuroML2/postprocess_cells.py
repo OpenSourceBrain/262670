@@ -20,7 +20,9 @@ from pyneuroml.pynml import write_neuroml2_file, run_lems_with_jneuroml_neuron
 from pyneuroml.lems import generate_lems_file_for_neuroml
 from pyneuroml.plot import generate_plot
 from pyneuroml.neuron import morphinfo, getinfo, load_hoc_or_python_file
+from pyneuroml.annotations import create_annotation
 from neuroml.utils import component_factory
+from textwrap import indent
 
 random.seed(1412)
 
@@ -75,6 +77,28 @@ def postprocess_GGN():
     celldoc = load_and_setup_cell(cellname)
     cell = celldoc.cells[0]  # type: neuroml.Cell
 
+    # TODO: add organism
+    annotation = create_annotation(
+        subject=cell.id, title="Giant GABAergic Neuron model",
+        description="Subhasis Ray, Zane N Aldworth, Mark A Stopfer (2020) Feedback inhibition and its control in an insect olfactory circuit eLife 9:e53281.",
+        annotation_style="miriam",
+        serialization_format="pretty-xml",
+        xml_header=False,
+        citations={"https://doi.org/10.7554/eLife.53281": "Subhasis Ray, Zane N Aldworth, Mark A Stopfer (2020) Feedback inhibition and its control in an insect olfactory circuit eLife 9:e53281."},
+        sources={"https://modeldb.science/262670": "ModelDB",
+                 "https://github.com/OpenSourceBrain/262670": "GitHub",
+                 "https://v1.opensourcebrain.org/projects/locust-mushroom-body":
+                 "Open Source Brain"},
+        authors={"Subhasis Ray":
+                 {"https://orcid.org/0000-0003-2566-7146": "orcid"},
+                 },
+        contributors={
+            "Ankur Sinha": {"https://orcid.org/0000-0001-7568-7167": "orcid"},
+        },
+        creation_date="2024-04-25"
+    )
+    cell.annotation = neuroml.Annotation([annotation])
+
     # biophysics
     # all
     cell.add_channel_density(
@@ -105,6 +129,30 @@ def postprocess_KC():
     )  # type: neuroml.NeuroMLDocument
     cell = celldoc.add("Cell", id="KC", validate=False)  # type: neuroml.Cell
     cell.setup_nml_cell()
+
+    # TODO: add organism
+    annotation = create_annotation(
+        subject=cell.id, title="Kenyon cell model",
+        description="Subhasis Ray, Zane N Aldworth, Mark A Stopfer (2020) Feedback inhibition and its control in an insect olfactory circuit eLife 9:e53281.",
+        annotation_style="miriam",
+        serialization_format="pretty-xml",
+        xml_header=False,
+        encodes_other_biology={"http://uri.neuinfo.org/nif/nifstd/nlx_147420": "cell"},
+        citations={"https://doi.org/10.7554/eLife.53281": "Subhasis Ray, Zane N Aldworth, Mark A Stopfer (2020) Feedback inhibition and its control in an insect olfactory circuit eLife 9:e53281."},
+        sources={"https://modeldb.science/262670": "ModelDB",
+                 "https://github.com/OpenSourceBrain/262670": "GitHub",
+                 "https://v1.opensourcebrain.org/projects/locust-mushroom-body":
+                 "Open Source Brain"},
+        authors={"Subhasis Ray":
+                 {"https://orcid.org/0000-0003-2566-7146": "orcid"},
+                 },
+        contributors={
+            "Ankur Sinha": {"https://orcid.org/0000-0001-7568-7167": "orcid"},
+        },
+        creation_date="2024-04-25"
+    )
+    cell.annotation = neuroml.Annotation([annotation])
+
     cell.add_segment([0, 0, 0, 20], [0, 0, 6.366, 20], seg_type="soma")
 
     # biophysics
@@ -267,7 +315,7 @@ def getcellinfo(cellname):
 
 
 if __name__ == "__main__":
-    # postprocess_GGN()
+    postprocess_GGN()
     postprocess_KC()
-    step_current_omv_kc()
+    # step_current_omv_kc()
     # getcellinfo("KC")
