@@ -5,38 +5,57 @@
 
     <ComponentType name="Ray_inf"
         extends="baseVoltageDepVariable"
-        description="Inf parameter to describe naf" >
+        description="Inf parameter for Ray et al 2020" >
 
-        <Constant name="TIME_SCALE" dimension="time" value="1 s"/>
-        <Constant name="table_max" dimension="voltage" value="40 mV"/>
         <Parameter name="rate" dimension="none"/>
         <Parameter name="midpoint" dimension="voltage"/>
         <Parameter name="scale" dimension="voltage"/>
+        <Constant name="table_max" dimension="voltage" value="40 mV"/>
         <Dynamics>
             <ConditionalDerivedVariable name="x" dimension="per_time" exposure="x">
-                <Case condition="v .gt. table_max" value="(rate / (1 + exp(0 - (table_max - midpoint) / scale)))/TIME_SCALE"/>
-                <Case value="(rate / (1 + exp(0 - (v - midpoint) / scale)))/TIME_SCALE"/>
+                <Case condition="v .gt. table_max" value="(rate / (1 + exp(0 - (table_max - midpoint) / scale)))"/>
+                <Case value="(rate / (1 + exp(0 - (v - midpoint) / scale)))"/>
             </ConditionalDerivedVariable>
         </Dynamics>
     </ComponentType>
 
      <ComponentType name="Ray_tau"
                    extends="baseVoltageDepTime"
-                   description="Tau parameter to describe naf">
+                   description="Tau parameter for Ray et al 2020">
 
-        <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
-        <Constant name="table_max" dimension="voltage" value="40 mV"/>
-        <Parameter name="max_tau" dimension="per_time"/>
-        <Parameter name="min_tau" dimension="per_time"/>
+        <Parameter name="max_tau" dimension="time"/>
+        <Parameter name="min_tau" dimension="time"/>
         <Parameter name="midpoint" dimension="voltage"/>
         <Parameter name="scale" dimension="voltage"/>
+        <Constant name="table_max" dimension="voltage" value="40 mV"/>
         <Dynamics>
-            <ConditionalDerivedVariable name="t" dimension="per_time" exposure="t" >
+            <ConditionalDerivedVariable name="t" dimension="time" exposure="t" >
                 <Case condition="v .gt. table_max" value="((max_tau - min_tau) / (1 + exp(0 - (table_max - midpoint) / scale))) + min_tau"/>
-                <Case value="((max_tau - min_tau) / (1 + exp(0 - (v - midpoint) / scale))) + min_tau"/>
+                <Case value="(((max_tau - min_tau) / (1 + exp(0 - (v - midpoint) / scale))) + min_tau)"/>
             </ConditionalDerivedVariable>
 
         </Dynamics>
 
     </ComponentType>
+
+    <ComponentType name="Ray_ka_tau"
+                   extends="baseVoltageDepTime"
+                   description="Tau parameter to describe ka">
+
+        <Parameter name="max_tau" dimension="time"/>
+        <Parameter name="min_tau" dimension="time"/>
+        <Parameter name="midpoint1" dimension="voltage"/>
+        <Parameter name="scale1" dimension="voltage"/>
+        <Parameter name="midpoint2" dimension="voltage"/>
+        <Parameter name="scale2" dimension="voltage"/>
+        <Constant name="table_max" dimension="voltage" value="40 mV"/>
+        <Dynamics>
+            <ConditionalDerivedVariable name="t" dimension="time" exposure="t" >
+                <Case condition="v .gt. table_max" value="(max_tau - min_tau) / ((1 + exp(-(table_max + midpoint1) / scale1)) * ( 1 + exp((table_max + midpoint2) / scale2))) + min_tau"/>
+                <Case value="(max_tau - min_tau) / ((1 + exp(-(v + midpoint1) / scale1)) * ( 1 + exp((v + midpoint2) / scale2))) + min_tau"/>
+
+            </ConditionalDerivedVariable>
+        </Dynamics>
+    </ComponentType>
+
 </neuroml>

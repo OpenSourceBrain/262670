@@ -5,7 +5,6 @@
     <include href="RaySigmoid.nml" />
 
     <ionChannel id="ka" conductance="1pS" type="ionChannelHH" species="k">
-
         <notes>
                 Implementation of A type K+ channel ( KA ) from Wustenberg DG, Boytcheva M, Grunewald B, Byrne JH, Menzel R, Baxter DA.
                 This is transient A type K+ channel in Apis mellifera Kenyon cells (cultured).
@@ -13,53 +12,13 @@
 
         <!-- custom component types because the tables in the mod files only go to 40 -->
         <gate id="m" type="gateHHtauInf" instances="3">
+            <timeCourse type="Ray_ka_tau" midpoint1="70mV" midpoint2="2.0mV" scale1="4.0mV" scale2="12.0mV" min_tau="0.35ms" max_tau="1.65ms"/>
             <steadyState type="Ray_inf" rate="1.0" midpoint="-20.1mV" scale="16.1mV"/>
-            <timeCourse type="Ray_ka_taum"/>
         </gate>
 
         <gate id="h" type="gateHHtauInf" instances="1">
+            <timeCourse type="Ray_ka_tau" midpoint1="60mV" midpoint2="62.0mV" scale1="25.0mV" scale2="16.0mV" min_tau="2.5ms" max_tau="90.0ms"/>
             <steadyState type="Ray_inf" rate="1.0" midpoint="-74.7mV" scale="-7.0mV"/>
-            <timeCourse type="Ray_ka_tauh"/>
         </gate>
-
     </ionChannel>
-
-    <ComponentType name="Ray_ka_taum"
-                   extends="baseVoltageDepTime"
-                   description="Tau parameter to describe ka">
-
-        <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
-        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
-        <Constant name="max_tau" dimension="per_time" value="1.65 per_s"/>
-        <Constant name="min_tau" dimension="per_time" value="0.35 per_s"/>
-        <Dynamics>
-            <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
-            <ConditionalDerivedVariable name="t" dimension="per_time" exposure="t" >
-                <Case condition="V .gt. 40" value="(max_tau - min_tau) / ((1 + exp(-(40. + 70.0) / 4.0)) * ( 1 + exp((40. + 2.0) / 12.0))) + min_tau"/>
-                <Case value="(max_tau - min_tau) / ((1 + exp(-(V + 70.0) / 4.0)) * ( 1 + exp((V + 2.0) / 12.0))) + min_tau"/>
-
-            </ConditionalDerivedVariable>
-        </Dynamics>
-
-    </ComponentType>
-
-    <ComponentType name="Ray_ka_tauh"
-                   extends="baseVoltageDepTime"
-                   description="Tau parameter to describe ka">
-
-        <Constant name="TIME_SCALE" dimension="time" value="1 ms"/>
-        <Constant name="VOLT_SCALE" dimension="voltage" value="1 mV"/>
-        <Constant name="max_tau" dimension="per_time" value="90.0 per_s"/>
-        <Constant name="min_tau" dimension="per_time" value="2.5 per_s"/>
-        <Dynamics>
-            <DerivedVariable name="V" dimension="none" value="v / VOLT_SCALE"/>
-            <ConditionalDerivedVariable name="t" dimension="per_time" exposure="t" >
-                <Case condition="V .gt. 40" value="(max_tau - min_tau) / ((1 + exp(-(40. + 60.) / 25.0)) * (1 + exp((40. + 62.0) / 16.0))) + min_tau"/>
-                <Case value="(max_tau - min_tau) / ((1 + exp(-(V + 60.) / 25.0)) * (1 + exp((V + 62.0) / 16.0))) + min_tau"/>
-            </ConditionalDerivedVariable>
-
-        </Dynamics>
-
-    </ComponentType>
-
 </neuroml>

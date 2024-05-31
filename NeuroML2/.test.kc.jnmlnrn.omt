@@ -1,0 +1,15 @@
+target: LEMS_KC_step_test.xml
+engine: jNeuroML_NEURON
+mep: .test.kc.mep
+experiments:
+  stepKC:
+    observables:
+      spike times:
+        file:
+          path: KC_step_test.KC_pop.v.dat
+          columns: [0,1]
+          scaling: [1000,1000]
+        spike detection:
+          method: threshold
+          threshold: -10.
+        tolerance: 0.005087969567027844

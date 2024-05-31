@@ -13,10 +13,16 @@ Author: Ankur Sinha <sanjay DOT ankur AT gmail DOT com>
 
 import random
 
+import yaml
 import neuroml
 from neuroml.loaders import read_neuroml2_file
-from pyneuroml.pynml import write_neuroml2_file
+from pyneuroml.pynml import write_neuroml2_file, run_lems_with_jneuroml_neuron
+from pyneuroml.lems import generate_lems_file_for_neuroml
+from pyneuroml.plot import generate_plot
+from pyneuroml.neuron import morphinfo, getinfo, load_hoc_or_python_file
+from pyneuroml.annotations import create_annotation
 from neuroml.utils import component_factory
+from textwrap import indent
 
 random.seed(1412)
 
@@ -71,6 +77,28 @@ def postprocess_GGN():
     celldoc = load_and_setup_cell(cellname)
     cell = celldoc.cells[0]  # type: neuroml.Cell
 
+    # TODO: add organism
+    annotation = create_annotation(
+        subject=cell.id, title="Giant GABAergic Neuron model",
+        description="Subhasis Ray, Zane N Aldworth, Mark A Stopfer (2020) Feedback inhibition and its control in an insect olfactory circuit eLife 9:e53281.",
+        annotation_style="miriam",
+        serialization_format="pretty-xml",
+        xml_header=False,
+        citations={"https://doi.org/10.7554/eLife.53281": "Subhasis Ray, Zane N Aldworth, Mark A Stopfer (2020) Feedback inhibition and its control in an insect olfactory circuit eLife 9:e53281."},
+        sources={"https://modeldb.science/262670": "ModelDB",
+                 "https://github.com/OpenSourceBrain/262670": "GitHub",
+                 "https://v1.opensourcebrain.org/projects/locust-mushroom-body":
+                 "Open Source Brain"},
+        authors={"Subhasis Ray":
+                 {"https://orcid.org/0000-0003-2566-7146": "orcid"},
+                 },
+        contributors={
+            "Ankur Sinha": {"https://orcid.org/0000-0001-7568-7167": "orcid"},
+        },
+        creation_date="2024-04-25"
+    )
+    cell.annotation = neuroml.Annotation([annotation])
+
     # biophysics
     # all
     cell.add_channel_density(
@@ -96,47 +124,56 @@ def postprocess_GGN():
 
 def postprocess_KC():
     """Manually create KC and add biophysics."""
-    celldoc = component_factory("NeuroMLDocument", id="KC_doc")  # type: neuroml.NeuroMLDocument
+    celldoc = component_factory(
+        "NeuroMLDocument", id="KC_doc"
+    )  # type: neuroml.NeuroMLDocument
     cell = celldoc.add("Cell", id="KC", validate=False)  # type: neuroml.Cell
     cell.setup_nml_cell()
+
+    # TODO: add organism
+    annotation = create_annotation(
+        subject=cell.id, title="Kenyon cell model",
+        description="Subhasis Ray, Zane N Aldworth, Mark A Stopfer (2020) Feedback inhibition and its control in an insect olfactory circuit eLife 9:e53281.",
+        annotation_style="miriam",
+        serialization_format="pretty-xml",
+        xml_header=False,
+        encodes_other_biology={"http://uri.neuinfo.org/nif/nifstd/nlx_147420": "cell"},
+        citations={"https://doi.org/10.7554/eLife.53281": "Subhasis Ray, Zane N Aldworth, Mark A Stopfer (2020) Feedback inhibition and its control in an insect olfactory circuit eLife 9:e53281."},
+        sources={"https://modeldb.science/262670": "ModelDB",
+                 "https://github.com/OpenSourceBrain/262670": "GitHub",
+                 "https://v1.opensourcebrain.org/projects/locust-mushroom-body":
+                 "Open Source Brain"},
+        authors={"Subhasis Ray":
+                 {"https://orcid.org/0000-0003-2566-7146": "orcid"},
+                 },
+        contributors={
+            "Ankur Sinha": {"https://orcid.org/0000-0001-7568-7167": "orcid"},
+        },
+        creation_date="2024-04-25"
+    )
+    cell.annotation = neuroml.Annotation([annotation])
+
     cell.add_segment([0, 0, 0, 20], [0, 0, 6.366, 20], seg_type="soma")
 
     # biophysics
     # all
+    cell.set_resistivity("35.4 ohm_cm", group_id="all")
+    cell.set_specific_capacitance("1 uF_per_cm2", group_id="all")
+    cell.set_init_memb_potential("-70mV")
+    cell.set_spike_thresh("-10mV")
+
     cell.add_channel_density(
         nml_cell_doc=celldoc,
         cd_id="pas",
         ion_channel="pas",
-        cond_density=".0000975 S_per_cm2",
+        cond_density="9.75e-5 S_per_cm2",
         erev="-70 mV",
         group_id="all",
         ion="non_specific",
         ion_chan_def_file="channels/pas.channel.nml",
     )
-    cell.set_resistivity("35.4 ohm_cm", group_id="all")
-    cell.set_specific_capacitance("1 uF_per_cm2", group_id="all")
-    cell.set_init_memb_potential("-80mV")
 
-    cell.add_channel_density(
-        nml_cell_doc=celldoc,
-        cd_id="nas",
-        ion_channel="nas",
-        cond_density="3e-3 S_per_cm2",
-        erev="-58 mV",
-        group_id="all",
-        ion="na",
-        ion_chan_def_file="channels/nas.channel.nml",
-    )
-    cell.add_channel_density(
-        nml_cell_doc=celldoc,
-        cd_id="naf",
-        ion_channel="naf",
-        cond_density="3.5e-2 S_per_cm2",
-        erev="-58 mV",
-        group_id="all",
-        ion="na",
-        ion_chan_def_file="channels/naf.channel.nml",
-    )
+    # K
     cell.add_channel_density(
         nml_cell_doc=celldoc,
         cd_id="kv",
@@ -167,6 +204,27 @@ def postprocess_KC():
         ion="k",
         ion_chan_def_file="channels/kst.channel.nml",
     )
+    # Na
+    cell.add_channel_density(
+        nml_cell_doc=celldoc,
+        cd_id="naf",
+        ion_channel="naf",
+        cond_density="3.5e-2 S_per_cm2",
+        erev="58 mV",
+        group_id="all",
+        ion="na",
+        ion_chan_def_file="channels/naf.channel.nml",
+    )
+    cell.add_channel_density(
+        nml_cell_doc=celldoc,
+        cd_id="nas",
+        ion_channel="nas",
+        cond_density="3e-3 S_per_cm2",
+        erev="58 mV",
+        group_id="all",
+        ion="na",
+        ion_chan_def_file="channels/nas.channel.nml",
+    )
 
     # L1 validation
     # cell.validate(recursive=True)
@@ -175,6 +233,89 @@ def postprocess_KC():
     write_neuroml2_file(celldoc, "KC.cell.nml")
 
 
+def step_current_omv_kc():
+    """Create a step current simulation OMV LEMS file"""
+    # read the cell file, modify it, write a new one
+    netdoc = read_neuroml2_file("KC.cell.nml")
+    kc_cell = netdoc.cells[0]
+    net = netdoc.add(neuroml.Network, id="KC_net", validate=False)
+    pop = net.add(neuroml.Population, id="KC_pop", component=kc_cell.id, size=1)
+
+    # should be same as test_kc.py
+    pg = netdoc.add(
+        neuroml.PulseGenerator(
+            id="pg", delay="100ms", duration="500ms",
+            amplitude="16pA"
+        )
+    )
+
+    # Add these to cells
+    input_list = net.add(
+        neuroml.InputList(id="input_list", component=pg.id, populations=pop.id)
+    )
+    aninput = input_list.add(
+        neuroml.Input(
+            id="0",
+            target="../%s[0]" % (pop.id),
+            destination="synapses",
+            segment_id="0",
+        )
+    )
+    write_neuroml2_file(netdoc, "KC.net.nml")
+
+    generate_lems_file_for_neuroml(
+        sim_id="KC_step_test",
+        target=net.id,
+        neuroml_file="KC.net.nml",
+        duration="700ms",
+        dt="0.01ms",
+        lems_file_name="LEMS_KC_step_test.xml",
+        nml_doc=netdoc,
+        gen_spike_saves_for_all_somas=True,
+        target_dir=".",
+        gen_saves_for_quantities={
+            "k.dat": ["KC_pop[0]/biophys/membraneProperties/kv/iDensity"]
+        },
+        copy_neuroml=False
+    )
+
+    data = run_lems_with_jneuroml_neuron(
+        "LEMS_KC_step_test.xml", load_saved_data=True, compile_mods=True
+    )
+
+    print(data.keys())
+
+    # print(data)
+    generate_plot(
+        xvalues=[data["t"]],
+        yvalues=[data["KC_pop[0]/v"]],
+        title="Membrane potential: KC",
+    )
+
+
+def getcellinfo(cellname):
+    """Get info of cell from HOC
+
+    Used to match NeuroML hoc against original NEURON hoc.
+
+    :param cellname: TODO
+    :returns: TODO
+
+    """
+    from neuron import h
+    load_hoc_or_python_file(f"{cellname}.hoc")
+    h("celsius = 34")
+    h("objectvar mycell")
+    h("strdef reference")
+    h('reference = "acell"')
+    h(f'mycell = new {cellname}(reference, "{cellname}", "A cell")')
+    with open(f"NeuroML-info-{cellname}.yaml", "w") as f:
+        retval = getinfo(h.allsec())
+        print(yaml.dump(retval, sort_keys=True, indent=4), file=f, flush=True)
+
+
 if __name__ == "__main__":
     postprocess_GGN()
     postprocess_KC()
+    # step_current_omv_kc()
+    # getcellinfo("KC")

@@ -1,2 +1,12 @@
 *.dat
 x86_64/
+channels/*dat
+NeuroML2/channels/LEMS*
+NeuroML2/channels/*mod
+NeuroML2/*mod
+NeuroML2/*.hoc
+NeuroML2/*.dat
+NeuroML2/*_nrn.py
+NeuroML2/*.spikes
+.mypy_cache/
+*.npy
