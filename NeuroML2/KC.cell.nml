@@ -1,11 +1,69 @@
 <neuroml xmlns="http://www.neuroml.org/schema/neuroml2"  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2.3.xsd" id="KC_doc">
     <include href="channels/pas.channel.nml"/>
-    <include href="channels/nas.channel.nml"/>
-    <include href="channels/naf.channel.nml"/>
     <include href="channels/kv.channel.nml"/>
     <include href="channels/ka.channel.nml"/>
     <include href="channels/kst.channel.nml"/>
+    <include href="channels/naf.channel.nml"/>
+    <include href="channels/nas.channel.nml"/>
     <cell id="KC">
+        <annotation>
+            
+            <rdf:RDF
+              xmlns:dc="http://purl.org/dc/elements/1.1/"
+              xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"
+              xmlns:dcterms="http://purl.org/dc/terms/"
+              xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+              xmlns:bqmodel="http://biomodels.net/model-qualifiers/"
+            >
+              <rdf:Description rdf:about="KC">
+                <dc:title>Kenyon cell model</dc:title>
+                <dc:description>Subhasis Ray, Zane N Aldworth, Mark A Stopfer (2020) Feedback inhibition and its control in an insect olfactory circuit eLife 9:e53281.</dc:description>
+                <bqbiol:encodes>
+                  <rdf:Bag rdf:nodeID="Nc00a268a26874598bff06e0876cc57ed">
+                    <rdf:_1 rdf:resource="http://uri.neuinfo.org/nif/nifstd/nlx_147420"/>
+                  </rdf:Bag>
+                </bqbiol:encodes>
+                <dc:source>
+                  <rdf:Bag rdf:nodeID="N273df5f0f5134d69aa88c5f4be36205f">
+                    <rdf:_1 rdf:resource="https://modeldb.science/262670"/>
+                  </rdf:Bag>
+                </dc:source>
+                <dc:source>
+                  <rdf:Bag rdf:nodeID="N52bb0f14a2c745b5ad6ad543a175b940">
+                    <rdf:_1 rdf:resource="https://github.com/OpenSourceBrain/262670"/>
+                  </rdf:Bag>
+                </dc:source>
+                <dc:source>
+                  <rdf:Bag rdf:nodeID="N8ba0bc6b71f04e1297a2f41690fb845e">
+                    <rdf:_1 rdf:resource="https://v1.opensourcebrain.org/projects/locust-mushroom-body"/>
+                  </rdf:Bag>
+                </dc:source>
+                <bqmodel:isDescribedBy>
+                  <rdf:Bag rdf:nodeID="N32688f93918a4ad38df9061c90c2ab30">
+                    <rdf:_1 rdf:resource="https://doi.org/10.7554/eLife.53281"/>
+                  </rdf:Bag>
+                </bqmodel:isDescribedBy>
+                <dc:creator>
+                  <rdf:Bag rdf:nodeID="Ncd61d80f8e2c4b2a945b3daf84437df6">
+                    <rdf:_1>Subhasis Ray</rdf:_1>
+                    <rdf:_2>https://orcid.org/0000-0003-2566-7146</rdf:_2>
+                  </rdf:Bag>
+                </dc:creator>
+                <dc:contributor>
+                  <rdf:Bag rdf:nodeID="N8376b6c99c734829a6c8a38eca97b3da">
+                    <rdf:_1>Ankur Sinha</rdf:_1>
+                    <rdf:_2>https://orcid.org/0000-0001-7568-7167</rdf:_2>
+                  </rdf:Bag>
+                </dc:contributor>
+                <dcterms:created>
+                  <rdf:Description rdf:nodeID="Ncc1a5b98ec974d12b90db9403e67ef79">
+                    <dcterms:W3CDTF>2024-04-25</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+
+        </annotation>
         <morphology id="morphology">
             <segment id="0" name="Seg0">
                 <proximal x="0.0" y="0.0" z="0.0" diameter="20.0"/>
@@ -22,14 +80,15 @@
         </morphology>
         <biophysicalProperties id="biophys">
             <membraneProperties>
-                <channelDensity id="pas" ionChannel="pas" condDensity=".0000975 S_per_cm2" erev="-70 mV" ion="non_specific"/>
-                <channelDensity id="nas" ionChannel="nas" condDensity="3e-3 S_per_cm2" erev="-58 mV" ion="na"/>
-                <channelDensity id="naf" ionChannel="naf" condDensity="3.5e-2 S_per_cm2" erev="-58 mV" ion="na"/>
+                <channelDensity id="pas" ionChannel="pas" condDensity="9.75e-5 S_per_cm2" erev="-70 mV" ion="non_specific"/>
                 <channelDensity id="kv" ionChannel="kv" condDensity="1.5e-3 S_per_cm2" erev="-81 mV" ion="k"/>
                 <channelDensity id="ka" ionChannel="ka" condDensity="1.4525e-2 S_per_cm2" erev="-81 mV" ion="k"/>
                 <channelDensity id="kst" ionChannel="kst" condDensity="2.0275e-3 S_per_cm2" erev="-81 mV" ion="k"/>
+                <channelDensity id="naf" ionChannel="naf" condDensity="3.5e-2 S_per_cm2" erev="58 mV" ion="na"/>
+                <channelDensity id="nas" ionChannel="nas" condDensity="3e-3 S_per_cm2" erev="58 mV" ion="na"/>
+                <spikeThresh value="-10mV"/>
                 <specificCapacitance value="1 uF_per_cm2"/>
-                <initMembPotential value="-80mV"/>
+                <initMembPotential value="-70mV"/>
             </membraneProperties>
             <intracellularProperties>
                 <resistivity value="35.4 ohm_cm"/>

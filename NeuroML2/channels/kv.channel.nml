@@ -14,7 +14,7 @@
         <!-- custom component types because the tables in the mod files only go to 40 -->
         <gate id="m" type="gateHHtauInf" instances="4">
             <steadyState type="Ray_inf" rate="1.0" midpoint="-37.6mV" scale="27.24mV"/>
-            <timeCourse type="Ray_tau" min_tau="1.85 per_s" max_tau="3.53 per_s" midpoint="45.0 mV" scale="-13.71mV"/>
+            <timeCourse type="Ray_tau" min_tau="1.85 ms" max_tau="3.53 ms" midpoint="45.0 mV" scale="-13.71mV"/>
         </gate>
 
     </ionChannel>

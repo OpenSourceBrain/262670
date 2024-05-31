@@ -14,12 +14,12 @@
 
         <gate id="m" type="gateHHtauInf" instances="3">
             <steadyState type="Ray_inf" rate="1" midpoint="-30.1mV" scale="6.65mV"/>
-            <timeCourse type="Ray_tau" min_tau="0.83 per_s" max_tau="0.093 per_s" midpoint="-20.3 mV" scale="6.45mV"/>
+            <timeCourse type="Ray_tau" min_tau="0.83 ms" max_tau="0.093 ms" midpoint="-20.3 mV" scale="6.45mV"/>
         </gate>
 
         <gate id="h" type="gateHHtauInf" instances="1">
             <steadyState type="Ray_inf" rate="1" midpoint="-51.4mV" scale="-5.9mV"/>
-            <timeCourse type="Ray_tau" min_tau="1.9 per_s" max_tau="12.24 per_s" midpoint="-32.6 mV" scale="-8.0mV"/>
+            <timeCourse type="Ray_tau" min_tau="1.9 ms" max_tau="12.24 ms" midpoint="-32.6 mV" scale="-8.0mV"/>
         </gate>
     </ionChannel>
 </neuroml>
