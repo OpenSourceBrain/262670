@@ -117,6 +117,57 @@ def postprocess_KC():
     cell.set_specific_capacitance("1 uF_per_cm2", group_id="all")
     cell.set_init_memb_potential("-80mV")
 
+    cell.add_channel_density(
+        nml_cell_doc=celldoc,
+        cd_id="nas",
+        ion_channel="nas",
+        cond_density="3e-3 S_per_cm2",
+        erev="-58 mV",
+        group_id="all",
+        ion="na",
+        ion_chan_def_file="channels/nas.channel.nml",
+    )
+    cell.add_channel_density(
+        nml_cell_doc=celldoc,
+        cd_id="naf",
+        ion_channel="naf",
+        cond_density="3.5e-2 S_per_cm2",
+        erev="-58 mV",
+        group_id="all",
+        ion="na",
+        ion_chan_def_file="channels/naf.channel.nml",
+    )
+    cell.add_channel_density(
+        nml_cell_doc=celldoc,
+        cd_id="kv",
+        ion_channel="kv",
+        cond_density="1.5e-3 S_per_cm2",
+        erev="-81 mV",
+        group_id="all",
+        ion="k",
+        ion_chan_def_file="channels/kv.channel.nml",
+    )
+    cell.add_channel_density(
+        nml_cell_doc=celldoc,
+        cd_id="ka",
+        ion_channel="ka",
+        cond_density="1.4525e-2 S_per_cm2",
+        erev="-81 mV",
+        group_id="all",
+        ion="k",
+        ion_chan_def_file="channels/ka.channel.nml",
+    )
+    cell.add_channel_density(
+        nml_cell_doc=celldoc,
+        cd_id="kst",
+        ion_channel="kst",
+        cond_density="2.0275e-3 S_per_cm2",
+        erev="-81 mV",
+        group_id="all",
+        ion="k",
+        ion_chan_def_file="channels/kst.channel.nml",
+    )
+
     # L1 validation
     # cell.validate(recursive=True)
     cell.summary(morph=False, biophys=True)
@@ -124,70 +175,6 @@ def postprocess_KC():
     write_neuroml2_file(celldoc, "KC.cell.nml")
 
 
-def KC_create_na_channel():
-    """Create the Na channel.
-
-    This will create the Na channel and save it to a file.
-    It will also validate this file.
-
-    returns: name of the created file
-    """
-    na_channel = component_factory(
-        "IonChannelHH",
-        id="na_channel",
-        notes="Sodium channel for HH cell",
-        conductance="10pS",
-        species="na",
-        validate=False,
-    )
-    gate_m = component_factory(
-        "GateHHRates",
-        id="m",
-        instances="3",
-        notes="m gate for na channel",
-        validate=False,
-    )
-    m_forward_rate = component_factory(
-        "HHRate", type="HHExpLinearRate", rate="1per_ms", midpoint="-40mV", scale="10mV"
-    )
-    m_reverse_rate = component_factory(
-        "HHRate", type="HHExpRate", rate="4per_ms", midpoint="-65mV", scale="-18mV"
-    )
-
-    gate_m.add(m_forward_rate, hint="forward_rate", validate=False)
-    gate_m.add(m_reverse_rate, hint="reverse_rate")
-    na_channel.add(gate_m)
-
-    gate_h = component_factory(
-        "GateHHRates",
-        id="h",
-        instances="1",
-        notes="h gate for na channel",
-        validate=False,
-    )
-    h_forward_rate = component_factory(
-        "HHRate", type="HHExpRate", rate="0.07per_ms", midpoint="-65mV", scale="-20mV"
-    )
-    h_reverse_rate = component_factory(
-        "HHRate", type="HHSigmoidRate", rate="1per_ms", midpoint="-35mV", scale="10mV"
-    )
-    gate_h.add(h_forward_rate, hint="forward_rate", validate=False)
-    gate_h.add(h_reverse_rate, hint="reverse_rate")
-    na_channel.add(gate_h)
-
-    na_channel_doc = component_factory(
-        "NeuroMLDocument", id="na_channel", notes="Na channel for HH neuron"
-    )
-    na_channel_fn = "HH_example_na_channel.nml"
-    na_channel_doc.add(na_channel)
-    na_channel_doc.validate(recursive=True)
-
-    write_neuroml2_file(
-        nml2_doc=na_channel_doc, nml2_file_name=na_channel_fn, validate=True
-    )
-
-    return na_channel_fn
-
-
 if __name__ == "__main__":
     postprocess_GGN()
+    postprocess_KC()
