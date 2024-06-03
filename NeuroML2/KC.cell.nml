@@ -1,4 +1,4 @@
-<neuroml xmlns="http://www.neuroml.org/schema/neuroml2"  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2.3.xsd" id="KC_doc">
+<neuroml xmlns="http://www.neuroml.org/schema/neuroml2"  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2.3.1.xsd" id="KC_doc">
     <include href="channels/pas.channel.nml"/>
     <include href="channels/kv.channel.nml"/>
     <include href="channels/ka.channel.nml"/>
@@ -9,57 +9,57 @@
         <annotation>
             
             <rdf:RDF
-              xmlns:dc="http://purl.org/dc/elements/1.1/"
-              xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"
-              xmlns:dcterms="http://purl.org/dc/terms/"
+              xmlns:orcid="https://orcid.org/"
               xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+              xmlns:dc="http://purl.org/dc/elements/1.1/"
+              xmlns:dcterms="http://purl.org/dc/terms/"
+              xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"
               xmlns:bqmodel="http://biomodels.net/model-qualifiers/"
+              xmlns:foaf="http://xmlns.com/foaf/0.1/"
             >
               <rdf:Description rdf:about="KC">
                 <dc:title>Kenyon cell model</dc:title>
                 <dc:description>Subhasis Ray, Zane N Aldworth, Mark A Stopfer (2020) Feedback inhibition and its control in an insect olfactory circuit eLife 9:e53281.</dc:description>
                 <bqbiol:encodes>
-                  <rdf:Bag rdf:nodeID="Nc00a268a26874598bff06e0876cc57ed">
-                    <rdf:_1 rdf:resource="http://uri.neuinfo.org/nif/nifstd/nlx_147420"/>
+                  <rdf:Bag>
+                    <rdf:li rdf:resource="http://uri.neuinfo.org/nif/nifstd/nlx_147420"/>
                   </rdf:Bag>
                 </bqbiol:encodes>
                 <dc:source>
-                  <rdf:Bag rdf:nodeID="N273df5f0f5134d69aa88c5f4be36205f">
-                    <rdf:_1 rdf:resource="https://modeldb.science/262670"/>
-                  </rdf:Bag>
-                </dc:source>
-                <dc:source>
-                  <rdf:Bag rdf:nodeID="N52bb0f14a2c745b5ad6ad543a175b940">
-                    <rdf:_1 rdf:resource="https://github.com/OpenSourceBrain/262670"/>
-                  </rdf:Bag>
-                </dc:source>
-                <dc:source>
-                  <rdf:Bag rdf:nodeID="N8ba0bc6b71f04e1297a2f41690fb845e">
-                    <rdf:_1 rdf:resource="https://v1.opensourcebrain.org/projects/locust-mushroom-body"/>
+                  <rdf:Bag>
+                    <rdf:li rdf:resource="https://modeldb.science/262670"/>
+                    <rdf:li rdf:resource="https://github.com/OpenSourceBrain/262670"/>
+                    <rdf:li rdf:resource="https://v1.opensourcebrain.org/projects/locust-mushroom-body"/>
                   </rdf:Bag>
                 </dc:source>
                 <bqmodel:isDescribedBy>
-                  <rdf:Bag rdf:nodeID="N32688f93918a4ad38df9061c90c2ab30">
-                    <rdf:_1 rdf:resource="https://doi.org/10.7554/eLife.53281"/>
+                  <rdf:Bag>
+                    <rdf:li rdf:resource="https://doi.org/10.7554/eLife.53281"/>
                   </rdf:Bag>
                 </bqmodel:isDescribedBy>
                 <dc:creator>
-                  <rdf:Bag rdf:nodeID="Ncd61d80f8e2c4b2a945b3daf84437df6">
-                    <rdf:_1>Subhasis Ray</rdf:_1>
-                    <rdf:_2>https://orcid.org/0000-0003-2566-7146</rdf:_2>
+                  <rdf:Bag>
+                    <rdf:li rdf:resource="#Subhasis_Ray"/>
                   </rdf:Bag>
                 </dc:creator>
                 <dc:contributor>
-                  <rdf:Bag rdf:nodeID="N8376b6c99c734829a6c8a38eca97b3da">
-                    <rdf:_1>Ankur Sinha</rdf:_1>
-                    <rdf:_2>https://orcid.org/0000-0001-7568-7167</rdf:_2>
+                  <rdf:Bag>
+                    <rdf:li rdf:resource="#Ankur_Sinha"/>
                   </rdf:Bag>
                 </dc:contributor>
                 <dcterms:created>
-                  <rdf:Description rdf:nodeID="Ncc1a5b98ec974d12b90db9403e67ef79">
+                  <rdf:Description>
                     <dcterms:W3CDTF>2024-04-25</dcterms:W3CDTF>
                   </rdf:Description>
                 </dcterms:created>
+              </rdf:Description>
+              <rdf:Description rdf:about="#Ankur_Sinha">
+                <foaf:name>Ankur Sinha</foaf:name>
+                <orcid:id rdf:resource="https://orcid.org/0000-0001-7568-7167"/>
+              </rdf:Description>
+              <rdf:Description rdf:about="#Subhasis_Ray">
+                <foaf:name>Subhasis Ray</foaf:name>
+                <orcid:id rdf:resource="https://orcid.org/0000-0003-2566-7146"/>
               </rdf:Description>
             </rdf:RDF>
 
