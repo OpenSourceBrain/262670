@@ -114,6 +114,7 @@ def postprocess_GGN():
     cell.set_resistivity("0.1 kohm_cm", group_id="all")
     cell.set_specific_capacitance("1 uF_per_cm2", group_id="all")
     cell.set_init_memb_potential("-80mV")
+    cell.set_spike_thresh("-10mV")
 
     # L1 validation
     # cell.validate(recursive=True)
