@@ -1,3 +1,6 @@
+arm64
+__pycache__
+*.log
 *.dat
 x86_64/
 channels/*dat
